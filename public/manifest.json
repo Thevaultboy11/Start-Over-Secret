@@ -1,0 +1,22 @@
+{
+    "name": "Start Over Secret",
+    "short_name": "SOS",
+    "description": "Your Healing Companion App by Alice Dautovic",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#121212",
+    "theme_color": "#FF073A",
+    "icons": [
+      {
+        "src": "/heart_favicon2.png",
+        "sizes": "192x192",
+        "type": "image/png"
+      },
+      {
+        "src": "/heart_favicon2.png",
+        "sizes": "512x512",
+        "type": "image/png"
+      }
+    ]
+  }
+  

@@ -1,0 +1,18 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /emotional-gym
+Disallow: /recordings
+Disallow: /ex-button
+Disallow: /add-recordings
+Disallow: /forgot-password
+
+# Optional — Allow or Disallow these depending on your SEO goals
+Disallow: /signup
+Disallow: /login
+
+# Public SEO pages
+Allow: /get-back-with-ex
+Allow: /contact-us
+
+Sitemap: https://breakupaidkit.com/sitemap.xml
