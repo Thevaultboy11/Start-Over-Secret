@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import type { AppProps } from 'next/app';
 
-// ← add your Measurement ID here (same as in _document.tsx)
+// ← add your Measurement ID here (same as in _document.tsx) the new changes
 const GA4_ID = 'G-HNEK7JXBHE';
 
 /** fires a page_view to gtag */
