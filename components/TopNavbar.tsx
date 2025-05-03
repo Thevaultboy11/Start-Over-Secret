@@ -52,7 +52,7 @@ export default function TopNav() {
 
   const drawerLinks = [
     { label: 'Home', path: '/' },
-    { label: 'Telegram Community', external: true, path: 'https://t.me/breakupaid_elma' },
+    { label: 'Start direct chat', external: true, path: 'https://t.me/breakupaid_elma' },
     { label: 'Get Back With Ex?', path: '/get-back-with-ex' },
     { label: 'Contact Us', path: '/contact-us' },
   ];
@@ -241,7 +241,7 @@ export default function TopNav() {
             onClick={() => window.open('https://t.me/breakupaid_elma', '_blank')}
             sx={{ cursor: 'pointer', fontWeight: 'bold', textDecoration: 'underline' }}
           >
-            Text Me 1-on-1 on Telegram for Personal Advice After a Breakup
+            Healing App goes far… But text me for personal advice : )
           </Typography>
           <IconButton onClick={handleDismissBanner} sx={{ position: 'absolute', right: 8, top: 4 }}>
             <CloseIcon sx={{ color: 'white', fontSize: 20 }} />
