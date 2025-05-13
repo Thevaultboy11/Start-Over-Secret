@@ -38,7 +38,7 @@ export default function LandingPage() {
   const router = useRouter();
   const theme = useTheme();
 
-  const handleStartNow = ()=>{console.log('hello')}
+  const handleStartNow = ()=>{router.push("https://shop.beacons.ai/glow_up_bloom/da63cc17-55a5-4c17-b07f-7799c3ddf09f")}
   function getWeekRange() {
     const today = new Date();
     const day = today.getDay(); // 0 (Sun) to 6 (Sat)
