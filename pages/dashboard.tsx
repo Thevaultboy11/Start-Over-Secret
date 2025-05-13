@@ -175,6 +175,7 @@ function Dashboard() {
               Open Support Tool &gt;
             </Typography>
           </Box>
+          
         </>
       )}
     </Box>

@@ -61,7 +61,7 @@ const SignupPage: React.FC = () => {
       // Optional: redirect after some seconds
       setTimeout(() => {
         router.push('/login');
-      }, 5000); // 5 seconds
+      }, 10000); // 5 seconds
     } catch (err: any) {
       const code = err.code;
       const messages: { [key: string]: string } = {
@@ -98,6 +98,9 @@ const SignupPage: React.FC = () => {
               • You'll be redirected automatically<br />
               <br />
               Thank you for protecting our community! 💖
+            </Typography>
+            <Typography fontSize={14} color="text.secondary" mt={1}>
+             • You can use the Breakup Aid Kit app completely free for the first 7 days—even if you don’t buy the bundle. This first week is my little gift to you. After that the account will be deleted.
             </Typography>
           </Paper>
         ) : (

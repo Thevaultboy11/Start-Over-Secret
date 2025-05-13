@@ -19,6 +19,7 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { getDatabase, ref, get, set, update } from 'firebase/database';
+ 
 
 function AddRecordings() {
   const { user, loading, logout } = useAuth();
@@ -208,7 +209,7 @@ function AddRecordings() {
         </DialogContent>
       </Dialog>
     </Box>
-      {/* --- page JSX goes here --- */}
+   
     </>
   );
 }

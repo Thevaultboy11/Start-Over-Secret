@@ -390,7 +390,7 @@ export default function LandingPage() {
                 >
                   The Start Over Secret app gives you more than journaling. Built by Alice
                   Dautovic, this application was made to hold you accountable and help you
-                  grow—for free.
+                  grow—for free <i>(first 7 days)</i>.
                 </Typography>
 
                 <Button

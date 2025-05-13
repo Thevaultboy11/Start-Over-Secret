@@ -52,7 +52,7 @@ export default function TopNav() {
 
   const drawerLinks = [
     { label: 'Home', path: '/' },
-    { label: 'Start direct chat', external: true, path: 'https://t.me/breakupaid_elma' },
+    { label: 'Breakup Aid Kit', external: false, path: '/breakup-aid-kit' },
     { label: 'Get Back With Ex?', path: '/get-back-with-ex' },
     { label: 'Contact Us', path: '/contact-us' },
   ];
@@ -238,10 +238,10 @@ export default function TopNav() {
         >
           <TelegramIcon />
           <Typography
-            onClick={() => window.open('https://t.me/breakupaid_elma', '_blank')}
+            onClick={() => router.push('/breakup-aid-kit')}
             sx={{ cursor: 'pointer', fontWeight: 'bold', textDecoration: 'underline' }}
           >
-            Healing App goes far… But text me for personal advice : )
+            Healing apps help... but heartbreak needs more than just tracking feelings.
           </Typography>
           <IconButton onClick={handleDismissBanner} sx={{ position: 'absolute', right: 8, top: 4 }}>
             <CloseIcon sx={{ color: 'white', fontSize: 20 }} />
