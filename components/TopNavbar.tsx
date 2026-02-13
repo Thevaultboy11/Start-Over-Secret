@@ -13,26 +13,39 @@ import {
   ListItemButton,
   ListItemText,
   useMediaQuery,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import MedicalServicesIcon from '@mui/icons-material/MedicalServices';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 import TelegramIcon from '@mui/icons-material/Telegram';
 import { useAuth } from '../context/AuthContext';
-import { useEffect, useState } from 'react';
+import { MouseEvent, useContext, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import '@fontsource/poppins/700.css';
-import { useTranslate } from "../hooks/useTranslate";  // ★ ADDED
+import { useTranslate } from "../hooks/useTranslate";
+import { AppLanguage, LanguageContext } from "../context/LanguageContext";
+
+
+const languageOptions: { code: AppLanguage; label: string; flag: string }[] = [
+  { code: "en", label: "English", flag: "🇺🇸" },
+  { code: "bs", label: "Bosnian", flag: "🇧🇦" },
+];
 
 export default function TopNav() {
   const { user, logout } = useAuth();
-  const t = useTranslate(); // ★ ADDED
+  const { language, setLanguage } = useContext(LanguageContext);
+  const t = useTranslate();
   const isMobile = useMediaQuery('(max-width:600px)');
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [showBanner, setShowBanner] = useState(false);
+  const [languageAnchorEl, setLanguageAnchorEl] = useState<null | HTMLElement>(null);
 
   const router = useRouter();
+  const languageMenuOpen = Boolean(languageAnchorEl);
+  const selectedLanguage = languageOptions.find((option) => option.code === language) ?? languageOptions[0];
 
   const handleLogoClick = () => {
     if (!isMobile) router.push(user ? '/dashboard' : '/');
@@ -46,6 +59,19 @@ export default function TopNav() {
   const handleDismissBanner = () => {
     setShowBanner(false);
     sessionStorage.setItem('hideTelegramBanner', 'true');
+  };
+
+  const handleOpenLanguageMenu = (event: MouseEvent<HTMLElement>) => {
+    setLanguageAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseLanguageMenu = () => {
+    setLanguageAnchorEl(null);
+  };
+
+  const handleLanguageChange = (lang: AppLanguage) => {
+    setLanguage(lang);
+    handleCloseLanguageMenu();
   };
 
   // ★ TRANSLATED NAV ITEMS
@@ -143,7 +169,16 @@ export default function TopNav() {
             <IconButton onClick={() => setDrawerOpen(true)}>
               <MenuIcon sx={{ color: 'white' }} />
             </IconButton>
-          ) : user ? (
+          ) : (
+            <Box display="flex" alignItems="center" gap={2}>
+              <Button
+                onClick={handleOpenLanguageMenu}
+                sx={{ color: 'white', fontWeight: 'bold', textTransform: 'none', minWidth: 0 }}
+              >
+                {selectedLanguage.flag} {selectedLanguage.label}
+              </Button>
+
+              {user ? (
             <Button
               variant="outlined"
               onClick={logout}
@@ -166,7 +201,7 @@ export default function TopNav() {
             >
               {t("topNav.auth.logout")}
             </Button>
-          ) : (
+              ) : (
             <Box display="flex" gap={2}>
               <Link href="/login" passHref legacyBehavior>
                 <Button
@@ -217,8 +252,24 @@ export default function TopNav() {
               </Link>
             </Box>
           )}
+            </Box>
+          )}
         </Toolbar>
       </AppBar>
+
+      <Menu
+        anchorEl={languageAnchorEl}
+        open={languageMenuOpen}
+        onClose={handleCloseLanguageMenu}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        {languageOptions.map((option) => (
+          <MenuItem key={option.code} onClick={() => handleLanguageChange(option.code)}>
+            {option.flag} {option.label}
+          </MenuItem>
+        ))}
+      </Menu>
 
       {/* Telegram Banner */}
       {showBanner && (
@@ -290,6 +341,27 @@ export default function TopNav() {
                 </ListItem>
               ))}
             </List>
+
+            <Box mt={2} mb={3}>
+              {languageOptions.map((option) => (
+                <Button
+                  key={option.code}
+                  fullWidth
+                  onClick={() => {
+                    setLanguage(option.code);
+                    setDrawerOpen(false);
+                  }}
+                  sx={{
+                    justifyContent: 'flex-start',
+                    fontWeight: language === option.code ? 'bold' : 500,
+                    color: 'white',
+                    textTransform: 'none',
+                  }}
+                >
+                  {option.flag} {option.label}
+                </Button>
+              ))}
+            </Box>
 
             {user ? (
               <Button
