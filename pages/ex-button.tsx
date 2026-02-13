@@ -8,7 +8,6 @@ import { Typography, useTheme, useMediaQuery } from '@mui/material';
 import { motion } from 'framer-motion';
 import { exMessagesEN, exMessagesBS } from "../data/exButtonMessage";
 import { exButtonContentBS, exButtonContentEN } from '@/data/exButtonContent';
-import { appPageLabelsBS, appPageLabelsEN } from '@/data/appPageLabels';
 import { LanguageContext } from "@/context/LanguageContext";
 
 function ExButton() {
@@ -19,7 +18,6 @@ function ExButton() {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { language } = useContext(LanguageContext);
   const content = language === 'bs' ? exButtonContentBS : exButtonContentEN;
-  const page = language === 'bs' ? appPageLabelsBS.exButton : appPageLabelsEN.exButton;
 
   // Messages depending on language
   const messages = language === "bs" ? exMessagesBS : exMessagesEN;
