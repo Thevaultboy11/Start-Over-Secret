@@ -14,6 +14,7 @@ export interface BookingCallContent {
     name: string;
     bullets: string[];
   };
+  calendlyTitle: string;
 }
 
 export const bookingCallContentEN: BookingCallContent = {
@@ -44,6 +45,7 @@ export const bookingCallContentEN: BookingCallContent = {
       "10+ satisfied therapy and coaching clients",
     ],
   },
+  calendlyTitle: "Book your consultation",
 };
 
 export const bookingCallContentBS: BookingCallContent = {
@@ -74,6 +76,7 @@ export const bookingCallContentBS: BookingCallContent = {
       "10+ zadovoljnih klijenata u terapiji i coachingu",
     ],
   },
+  calendlyTitle: "Zakaži konsultacije",
 };
 
-export const calendlyBookingLink = "https://calendly.com/dzananovicelma83/30min";
+export const calendlyBookingLink = "https://calendly.com/dzananovicelma83";

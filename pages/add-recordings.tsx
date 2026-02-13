@@ -19,16 +19,17 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { getDatabase, ref, get, set, update } from 'firebase/database';
-import { useTranslate } from '../hooks/useTranslate'; // ★ ADDED
 import { useContext } from 'react';
 import { LanguageContext } from '@/context/LanguageContext';
 import { addRecordingsContentBS, addRecordingsContentEN } from '@/data/addRecordingsContent';
+import { appPageLabelsBS, appPageLabelsEN } from '@/data/appPageLabels';
 
 function AddRecordings() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const { language } = useContext(LanguageContext);
   const content = language === 'bs' ? addRecordingsContentBS : addRecordingsContentEN;
+  const page = language === 'bs' ? appPageLabelsBS.addRecordings : appPageLabelsEN.addRecordings;
 
   const userId = user?.uid;
 

@@ -112,7 +112,10 @@ export default function BookingCallPage() {
                     borderRadius: 2,
                   }}
                 >
-               
+                  <Typography variant="h4" sx={{ fontWeight: "bold", mb: 2, fontSize: { xs: "1.7rem", md: "2rem" } }}>
+                    {content.trust.title}
+                  </Typography>
+
                   <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2 }}>
                     {content.trust.name}
                   </Typography>
