@@ -234,11 +234,11 @@ export default function InnerCompassLanding() {
               <Box sx={{ display: "flex", justifyContent: { xs: "flex-start", md: "flex-end" } }}>
                 <Box
                   component="img"
-                  src="/inner_compass_formula.png"
+                  src="/hero2.png"
                   alt="Inner Compass emotional formula"
                   sx={{
-                    width: { xs: 260, md: 320 },
-                    height: { xs: 260, md: 320 },
+                    width: { xs: 260, md: 420 },
+                    height: { xs: 260, md: 420 },
                     borderRadius: 2,
                     objectFit: "cover",
                   }}
@@ -345,7 +345,7 @@ export default function InnerCompassLanding() {
               <Box sx={{ display: "flex", justifyContent: { xs: "flex-start", md: "flex-end" } }}>
                 <Box
                   component="img"
-                  src="/quiz_preview.png"
+                  src="/form_results.png"
                   alt="Ex quiz preview"
                   sx={{
                     width: { xs: 260, md: 320 },
