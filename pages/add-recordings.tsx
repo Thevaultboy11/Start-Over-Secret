@@ -26,6 +26,7 @@ import { addRecordingsContentBS, addRecordingsContentEN } from '@/data/addRecord
 
 function AddRecordings() {
   const { user, loading } = useAuth();
+  const t = useTranslate(); // ★ ADDED
   const router = useRouter();
   const { language } = useContext(LanguageContext);
   const content = language === 'bs' ? addRecordingsContentBS : addRecordingsContentEN;
@@ -127,7 +128,7 @@ function AddRecordings() {
     router.push('/recordings');
   };
 
-  if (loading) return <div>{page.loading}</div>;
+  if (loading) return <div>{t("addRecordingsPage.loading")}</div>;
 
   if (!user) {
     if (typeof window !== 'undefined') router.push('/login');
@@ -137,7 +138,7 @@ function AddRecordings() {
   return (
     <>
       <Head>
-        <title>{page.title}</title>
+        <title>{t("addRecordingsPage.title")}</title>
         <meta name="robots" content="noindex, nofollow" />
         <link rel="canonical" href="https://breakupaidkit.com/add-recordings" />
       </Head>
@@ -145,7 +146,7 @@ function AddRecordings() {
       <Box p={2} pt={3} pb={10}>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
           <Typography variant="h6" fontWeight="bold">
-            {page.header}
+            {t("addRecordingsPage.header")}
           </Typography>
 
           <IconButton onClick={resetForm} sx={{ color: 'white' }}>
@@ -162,7 +163,7 @@ function AddRecordings() {
           }}
         >
           <Typography mt={2} fontSize={14} color="white">
-            {page.titleLabel} {title || '...'}
+            {t("addRecordingsPage.titleLabel")} {title || '...'}
           </Typography>
 
           <TextField
@@ -170,12 +171,12 @@ function AddRecordings() {
             inputProps={{ maxLength: 60 }}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder={page.titlePlaceholder}
+            placeholder={t("addRecordingsPage.titlePlaceholder")}
             sx={{ mt: 1, mb: 2 }}
           />
 
           <Typography fontSize={14} fontWeight="bold" color="white" gutterBottom>
-            {page.moodLabel} ({mood}){page.moodScale} {moodEmoji(mood)}
+            {t("addRecordingsPage.moodLabel")} ({mood}){t("addRecordingsPage.moodScale")} {moodEmoji(mood)}
           </Typography>
 
           <Slider
@@ -187,7 +188,7 @@ function AddRecordings() {
           />
 
           <Typography fontSize={14} fontWeight="bold" color="white" gutterBottom>
-            {page.likelihoodLabel} ({likelihood}){page.likelihoodScale} {likelihoodEmoji(likelihood)}
+            {t("addRecordingsPage.likelihoodLabel")} ({likelihood}){t("addRecordingsPage.likelihoodScale")} {likelihoodEmoji(likelihood)}
           </Typography>
 
           <Slider
@@ -199,7 +200,7 @@ function AddRecordings() {
           />
 
           <Typography fontSize={14} fontWeight="bold" color="white" gutterBottom>
-            {page.activitiesLabel}
+            {t("addRecordingsPage.activitiesLabel")}
           </Typography>
 
           <Box display="flex" flexWrap="wrap" gap={1}>
@@ -221,16 +222,16 @@ function AddRecordings() {
             sx={{ mt: 3 }}
             onClick={handleSubmit}
           >
-            {page.submitButton}
+            {t("addRecordingsPage.submitButton")}
           </Button>
         </Paper>
 
         <Dialog open={showModal} onClose={() => setShowModal(false)}>
           <DialogTitle sx={{ color: 'white', bgcolor: '#000' }}>
-            {page.modalTitle}
+            {t("addRecordingsPage.modalTitle")}
           </DialogTitle>
           <DialogContent sx={{ color: 'white', bgcolor: '#000' }}>
-            {page.modalMessage}
+            {t("addRecordingsPage.modalMessage")}
           </DialogContent>
         </Dialog>
       </Box>
