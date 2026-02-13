@@ -7,6 +7,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Typography, useTheme, useMediaQuery } from '@mui/material';
 import { motion } from 'framer-motion';
 import { exMessagesEN, exMessagesBS } from "../data/exButtonMessage";
+import { exButtonContentBS, exButtonContentEN } from '@/data/exButtonContent';
 import { LanguageContext } from "@/context/LanguageContext";
 import { useTranslate } from "../hooks/useTranslate"; // ★ ADDED
 
@@ -18,6 +19,7 @@ function ExButton() {
 
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { language } = useContext(LanguageContext);
+  const content = language === 'bs' ? exButtonContentBS : exButtonContentEN;
 
   // Messages depending on language
   const messages = language === "bs" ? exMessagesBS : exMessagesEN;
@@ -46,7 +48,8 @@ function ExButton() {
       <Head>
         <title>{t("exButtonPage.title")}</title>
         <meta name="robots" content="noindex, nofollow" />
-        <link rel="canonical" href="https://breakupaidkit.com/ex-button" />
+        <meta name="description" content={content.canonicalTitle} />
+        <link rel="canonical" href={`https://breakupaidkit.com${content.canonicalPath}`} />
       </Head>
 
       {/* HEADER */}

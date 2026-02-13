@@ -20,11 +20,16 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 import { getDatabase, ref, get, set, update } from 'firebase/database';
 import { useTranslate } from '../hooks/useTranslate'; // ★ ADDED
+import { useContext } from 'react';
+import { LanguageContext } from '@/context/LanguageContext';
+import { addRecordingsContentBS, addRecordingsContentEN } from '@/data/addRecordingsContent';
 
 function AddRecordings() {
   const { user, loading } = useAuth();
   const t = useTranslate(); // ★ ADDED
   const router = useRouter();
+  const { language } = useContext(LanguageContext);
+  const content = language === 'bs' ? addRecordingsContentBS : addRecordingsContentEN;
 
   const userId = user?.uid;
 
@@ -49,27 +54,13 @@ function AddRecordings() {
     return map[value] || '🤷';
   };
 
-  const allActivities: { key: keyof typeof t extends never ? string : string; label: string }[] = [
-    { key: "exercise", label: t("addRecordingsPage.activities.exercise") },
-    { key: "therapy", label: t("addRecordingsPage.activities.therapy") },
-    { key: "socialTime", label: t("addRecordingsPage.activities.socialTime") },
-    { key: "hydration", label: t("addRecordingsPage.activities.hydration") },
-    { key: "breathing", label: t("addRecordingsPage.activities.breathing") },
-    { key: "dryBrushing", label: t("addRecordingsPage.activities.dryBrushing") },
-    { key: "huggedSomeone", label: t("addRecordingsPage.activities.huggedSomeone") },
-    { key: "tookBath", label: t("addRecordingsPage.activities.tookBath") },
-    { key: "healthyMeal", label: t("addRecordingsPage.activities.healthyMeal") },
-    { key: "nap", label: t("addRecordingsPage.activities.nap") },
-    { key: "spiritualPractice", label: t("addRecordingsPage.activities.spiritualPractice") },
-    { key: "creativeHobby", label: t("addRecordingsPage.activities.creativeHobby") },
-    { key: "meditated", label: t("addRecordingsPage.activities.meditated") }
-  ];
+  const allActivities = content.activities;
 
-  const toggleActivity = (activity: string) => {
+  const toggleActivity = (activityKey: string) => {
     setSelectedActivities((prev) =>
-      prev.includes(activity)
-        ? prev.filter((a) => a !== activity)
-        : [...prev, activity]
+      prev.includes(activityKey)
+        ? prev.filter((a) => a !== activityKey)
+        : [...prev, activityKey]
     );
   };
 
@@ -122,7 +113,7 @@ function AddRecordings() {
     } else {
       const initialCounts: any = {};
       allActivities.forEach((act) => {
-        initialCounts[act.label] = selectedActivities.includes(act.label) ? 1 : 0;
+        initialCounts[act.key] = selectedActivities.includes(act.key) ? 1 : 0;
       });
 
       await set(userRef, {
@@ -217,8 +208,8 @@ function AddRecordings() {
               <Chip
                 key={activityObj.key}
                 label={activityObj.label}
-                onClick={() => toggleActivity(activityObj.label)}
-                variant={selectedActivities.includes(activityObj.label) ? 'filled' : 'outlined'}
+                onClick={() => toggleActivity(activityObj.key)}
+                variant={selectedActivities.includes(activityObj.key) ? 'filled' : 'outlined'}
                 sx={{ color: 'white', borderColor: 'white' }}
               />
             ))}

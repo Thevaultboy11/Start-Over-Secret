@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   Box, Typography, Paper, Grid, Tooltip, Chip, useMediaQuery, useTheme, List, ListItem, ListItemText, CircularProgress,
 } from '@mui/material';
@@ -8,10 +8,13 @@ import withAuth from '../components/withAuth';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useTranslate } from '../hooks/useTranslate';  // ★ ADDED
+import { LanguageContext } from '@/context/LanguageContext';
+import { dashboardActivityLabelsBS, dashboardActivityLabelsEN } from '@/data/dashboardContent';
 
 function Dashboard() {
   const { user, loading } = useAuth();
   const t = useTranslate(); // ★ ADDED
+  const { language } = useContext(LanguageContext);
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -29,7 +32,7 @@ function Dashboard() {
     const db = getDatabase();
     const userRef = ref(db, 'users/' + user.uid);
 
-    onValue(
+    const unsubscribe = onValue(
       userRef,
       (snapshot) => {
         const data = snapshot.val();
@@ -79,7 +82,11 @@ function Dashboard() {
         setFireBaseloading(false);
       }
     );
-  }, [user, t]);
+
+    return () => unsubscribe();
+  }, [user, language]);
+
+  const activityLabels = language === 'bs' ? dashboardActivityLabelsBS : dashboardActivityLabelsEN;
 
   const getEmoji = (score: number) => {
     const moodMap: { [key: number]: string } = {
@@ -164,6 +171,7 @@ function Dashboard() {
                     </Typography>
 
                     <Typography
+                      component="div"
                       sx={{ py: 2 }}
                       fontSize={36}
                       fontWeight="bold"
@@ -222,10 +230,11 @@ function Dashboard() {
                 {topActivities.map(([name, count], index) => (
                   <ListItem key={name} disablePadding>
                     <ListItemText
-                      primary={`${index + 1}. ${name}`}
+                      primary={`${index + 1}. ${activityLabels[name as keyof typeof activityLabels] ?? name}`}
                       primaryTypographyProps={{
                         fontSize: 14,
-                        color: 'white'
+                        color: 'white',
+                        sx: { wordBreak: 'break-word', pr: 2 },
                       }}
                     />
                     <Typography fontSize={14} color="white">
