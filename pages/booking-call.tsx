@@ -136,7 +136,7 @@ export default function BookingCallPage() {
               <Grid size={{ xs: 12, md: 6 }}>
                 <Box
                   component="img"
-                  src="/cta2_image.png"
+                  src="/authority.png"
                   alt="Elma Dzananovic"
                   sx={{
                     width: "100%",
