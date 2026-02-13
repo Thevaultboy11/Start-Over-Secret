@@ -11,7 +11,7 @@ export default function Document() {
     '@type': 'Organization',
     name: 'UnutrasnjiKompas',
     url: 'https://breakupaidkit.com',
-    logo: 'https://breakupaidkit.com/images/logo.png',
+    logo: 'https://breakupaidkit.com/images/logo.svg',
     sameAs: ['https://x.com/StartOverSecret'],
   };
 
