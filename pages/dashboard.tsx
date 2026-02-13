@@ -7,14 +7,14 @@ import { getDatabase, ref, onValue } from 'firebase/database';
 import withAuth from '../components/withAuth';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
+import { useTranslate } from '../hooks/useTranslate';  // ★ ADDED
 import { LanguageContext } from '@/context/LanguageContext';
 import { dashboardActivityLabelsBS, dashboardActivityLabelsEN } from '@/data/dashboardContent';
-import { appPageLabelsBS, appPageLabelsEN } from '@/data/appPageLabels';
 
 function Dashboard() {
   const { user, loading } = useAuth();
+  const t = useTranslate(); // ★ ADDED
   const { language } = useContext(LanguageContext);
-  const page = language === 'bs' ? appPageLabelsBS.dashboard : appPageLabelsEN.dashboard;
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
