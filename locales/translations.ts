@@ -113,7 +113,7 @@ export const translations = {
 
     /* ───────────── TOP NAVIGATION ───────────── */
     topNav: {
-      brand: "UnutrasnjiKompas",
+      brand: "Inner Compass",
 
       links: {
         home: "Home",
@@ -410,7 +410,7 @@ export const translations = {
 
     /* ───────────── TOP NAVIGATION ───────────── */
     topNav: {
-      brand: "UnutrasnjiKompas",
+      brand: "Unutrašnji Kompas",
 
       links: {
         home: "Početna",
