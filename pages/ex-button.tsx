@@ -9,11 +9,13 @@ import { motion } from 'framer-motion';
 import { exMessagesEN, exMessagesBS } from "../data/exButtonMessage";
 import { exButtonContentBS, exButtonContentEN } from '@/data/exButtonContent';
 import { LanguageContext } from "@/context/LanguageContext";
+import { useTranslate } from "../hooks/useTranslate"; // ★ ADDED
 
 function ExButton() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const theme = useTheme();
+  const t = useTranslate(); // ★ ADDED
 
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { language } = useContext(LanguageContext);
@@ -34,7 +36,7 @@ function ExButton() {
     setCurrentIndex((prev) => (prev + 1) % shuffledMessages.length);
   };
 
-  if (loading) return <div>{language === 'bs' ? 'Učitavanje...' : 'Loading...'}</div>;
+  if (loading) return <div>{t("common.loading")}</div>;
 
   if (!user) {
     if (typeof window !== 'undefined') router.push('/login');
@@ -44,7 +46,7 @@ function ExButton() {
   return (
     <>
       <Head>
-        <title>{page.title}</title>
+        <title>{t("exButtonPage.title")}</title>
         <meta name="robots" content="noindex, nofollow" />
         <meta name="description" content={content.canonicalTitle} />
         <link rel="canonical" href={`https://breakupaidkit.com${content.canonicalPath}`} />
@@ -57,7 +59,7 @@ function ExButton() {
         color="white"
         sx={{ px: 2, pt: 2, pb: 4, textAlign: { xs: 'left', sm: 'center' } }}
       >
-        {page.header}
+        {t("exButtonPage.header")}
       </Typography>
 
       {/* BUTTON */}
@@ -80,7 +82,7 @@ function ExButton() {
         }}
       >
         <Typography fontSize={16} fontWeight="bold" color="rgba(255, 255, 255, 0.9)">
-          {page.button}
+          {t("exButtonPage.button")}
         </Typography>
       </motion.div>
 
