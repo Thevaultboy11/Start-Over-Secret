@@ -22,16 +22,15 @@ import { motion } from 'framer-motion';
 import { emotionalGymEN } from "../data/emotionalGym";
 import { emotionalGymBH } from "../data/emotionalGym";
 
-// TRANSLATION HOOK + LANGUAGE CONTEXT
-import { useTranslate } from "@/hooks/useTranslate";
 import { useContext } from "react";
 import { LanguageContext } from "@/context/LanguageContext";
+import { appPageLabelsBS, appPageLabelsEN } from '@/data/appPageLabels';
 
 function EmotionalGym() {
   const { user, loading } = useAuth();
   const router = useRouter();
-  const t = useTranslate();
   const { language } = useContext(LanguageContext);   // <── Detect current language
+  const page = language === 'bs' ? appPageLabelsBS.emotionalGym : appPageLabelsEN.emotionalGym;
 
   // CHOOSE DATASET BASED ON LANGUAGE
   const data = language === "bs" ? emotionalGymBH : emotionalGymEN;
@@ -78,7 +77,7 @@ function EmotionalGym() {
   if (!currentScenario) return null;
 
   if (loading) {
-    return <div>{t("emotionalGymPage.loading")}</div>;
+    return <div>{page.loading}</div>;
   }
 
   if (!user) {
@@ -89,14 +88,14 @@ function EmotionalGym() {
   return (
     <>
       <Head>
-        <title>{t("emotionalGymPage.title")}</title>
+        <title>{page.title}</title>
         <meta name="robots" content="noindex, nofollow" />
         <link rel="canonical" href="https://breakupaidkit.com/emotional-gym" />
       </Head>
 
       <Box p={2} pt={3}>
         <Typography variant="h6" fontWeight="bold" gutterBottom>
-          {t("emotionalGymPage.title")}
+          {page.title}
         </Typography>
 
         {/* CATEGORY BUTTONS */}
@@ -137,7 +136,9 @@ function EmotionalGym() {
             />
 
             <Typography fontSize={12} color="gray">
-              {t("emotionalGymPage.scenarioCount")}
+              {page.scenarioCount
+                .replace('{{current}}', String(scenarioIndex + 1))
+                .replace('{{total}}', String(currentCategoryData.scenarios.length))}
             </Typography>
           </Box>
 
@@ -153,7 +154,7 @@ function EmotionalGym() {
                 onClick={() => setShowFullText(true)}
                 sx={{ textTransform: 'none', ml: 1 }}
               >
-                {t("emotionalGymPage.loadMore")}
+                {page.loadMore}
               </Button>
             )}
           </Typography>
@@ -179,7 +180,7 @@ function EmotionalGym() {
               sx={{ mt: 2, textTransform: 'none' }}
               disabled={!selected}
             >
-              {t("emotionalGymPage.submitAnswer")}
+              {page.submitAnswer}
             </Button>
           )}
 
@@ -195,8 +196,8 @@ function EmotionalGym() {
                 color={selected === currentScenario.correct_answer ? 'green' : 'red'}
               >
                 {selected === currentScenario.correct_answer
-                  ? t("emotionalGymPage.correct")
-                  : t("emotionalGymPage.incorrect")}
+                  ? page.correct
+                  : page.incorrect.replace('{{answer}}', selected)}
               </Typography>
 
               <Typography mt={1} fontSize={14}>
@@ -213,7 +214,7 @@ function EmotionalGym() {
               disabled={scenarioIndex === 0}
               onClick={handlePrevious}
             >
-              {t("emotionalGymPage.previous")}
+              {page.previous}
             </Button>
 
             <Button
@@ -226,7 +227,7 @@ function EmotionalGym() {
               }
               onClick={handleNext}
             >
-              {t("emotionalGymPage.next")}
+              {page.next}
             </Button>
           </Box>
         </Paper>
