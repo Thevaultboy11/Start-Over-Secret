@@ -9,7 +9,7 @@ export default function Document() {
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'Start Over Secret',
+    name: 'UnutrasnjiKompas',
     url: 'https://breakupaidkit.com',
     logo: 'https://breakupaidkit.com/images/logo.png',
     sameAs: ['https://x.com/StartOverSecret'],
@@ -20,7 +20,7 @@ export default function Document() {
       <Head>
         {/* SEO basics -------------------------------------------------- */}
         <meta name="description" content="Feeling lost after a breakup? …" />
-        <meta property="og:title" content="Healing with Alice Dautovic’s Start Over Secret" />
+        <meta property="og:title" content="Healing with Elma Dzananovic’s UnutrasnjiKompas" />
         {/*  …your existing <meta> + icons + fonts stay here … */}
 
         {/* Google site-verification  (add your token) ----------------- */}
