@@ -1,4 +1,4 @@
-// pages/your-page.tsx
+// pages/add-recordings.tsx
 import withAuth from '../components/withAuth';
 import Head from 'next/head';
 import { useAuth } from '../context/AuthContext';
@@ -19,11 +19,13 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { getDatabase, ref, get, set, update } from 'firebase/database';
- 
+import { useTranslate } from '../hooks/useTranslate'; // ★ ADDED
 
 function AddRecordings() {
-  const { user, loading, logout } = useAuth();
+  const { user, loading } = useAuth();
+  const t = useTranslate(); // ★ ADDED
   const router = useRouter();
+
   const userId = user?.uid;
 
   const [title, setTitle] = useState('');
@@ -47,11 +49,20 @@ function AddRecordings() {
     return map[value] || '🤷';
   };
 
-  const allActivities = [
-    '✅ Exercise', '💬 Therapy', '🧑‍🤝‍🧑 Social Time', '💧 Hydration',
-    '🌬️ Breathing', '🪥 Dry Brushing', '🤗 Hugged Someone', '🛁 Took a Bath',
-    '🥗 Ate a Healthy Meal', '😴 Took a Nap', '✨ Spiritual Practice', '🎨 Creative Hobby',
-    '🧘 Meditated'
+  const allActivities: { key: keyof typeof t extends never ? string : string; label: string }[] = [
+    { key: "exercise", label: t("addRecordingsPage.activities.exercise") },
+    { key: "therapy", label: t("addRecordingsPage.activities.therapy") },
+    { key: "socialTime", label: t("addRecordingsPage.activities.socialTime") },
+    { key: "hydration", label: t("addRecordingsPage.activities.hydration") },
+    { key: "breathing", label: t("addRecordingsPage.activities.breathing") },
+    { key: "dryBrushing", label: t("addRecordingsPage.activities.dryBrushing") },
+    { key: "huggedSomeone", label: t("addRecordingsPage.activities.huggedSomeone") },
+    { key: "tookBath", label: t("addRecordingsPage.activities.tookBath") },
+    { key: "healthyMeal", label: t("addRecordingsPage.activities.healthyMeal") },
+    { key: "nap", label: t("addRecordingsPage.activities.nap") },
+    { key: "spiritualPractice", label: t("addRecordingsPage.activities.spiritualPractice") },
+    { key: "creativeHobby", label: t("addRecordingsPage.activities.creativeHobby") },
+    { key: "meditated", label: t("addRecordingsPage.activities.meditated") }
   ];
 
   const toggleActivity = (activity: string) => {
@@ -111,7 +122,7 @@ function AddRecordings() {
     } else {
       const initialCounts: any = {};
       allActivities.forEach((act) => {
-        initialCounts[act] = selectedActivities.includes(act) ? 1 : 0;
+        initialCounts[act.label] = selectedActivities.includes(act.label) ? 1 : 0;
       });
 
       await set(userRef, {
@@ -126,10 +137,9 @@ function AddRecordings() {
     router.push('/recordings');
   };
 
-  if (loading) return <div>Loading...</div>;   // while Firebase checks
+  if (loading) return <div>{t("addRecordingsPage.loading")}</div>;
 
   if (!user) {
-    // extra safety; withAuth should already redirect
     if (typeof window !== 'undefined') router.push('/login');
     return null;
   }
@@ -137,79 +147,103 @@ function AddRecordings() {
   return (
     <>
       <Head>
-      <title>Add Record</title>
-          <meta name="robots" content="noindex, nofollow" />
-          <link rel="canonical" href="https://breakupaidkit.com/add-recordings" />
+        <title>{t("addRecordingsPage.title")}</title>
+        <meta name="robots" content="noindex, nofollow" />
+        <link rel="canonical" href="https://breakupaidkit.com/add-recordings" />
       </Head>
+
       <Box p={2} pt={3} pb={10}>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-        <Typography variant="h6" fontWeight="bold">Add Reflection</Typography>
-        <IconButton onClick={resetForm} sx={{ color: 'white' }}>
-          <CloseIcon />
-        </IconButton>
-      </Box>
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+          <Typography variant="h6" fontWeight="bold">
+            {t("addRecordingsPage.header")}
+          </Typography>
 
-      <Paper sx={{ bgcolor: '#000', border: '1px solid rgba(255,255,255,0.3)', borderRadius: 2, p: 2 }}>
-        <Typography mt={2} fontSize={14} color="white">Title: {title || '...'}</Typography>
-        <TextField
-          fullWidth
-          inputProps={{ maxLength: 60 }}
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Enter reflection title"
-          sx={{ mt: 1, mb: 2 }}
-        />
-
-        <Typography fontSize={14} fontWeight="bold" color="white" gutterBottom>
-          Mood ({mood})/10: {moodEmoji(mood)}
-        </Typography>
-        <Slider
-          min={1}
-          max={10}
-          value={mood}
-          onChange={(_, v) => setMood(v as number)}
-          sx={{ mb: 2 }}
-        />
-
-        <Typography fontSize={14} fontWeight="bold" color="white" gutterBottom>
-          Likelihood to text back ({likelihood})/5: {likelihoodEmoji(likelihood)}
-        </Typography>
-        <Slider
-          min={1}
-          max={5}
-          value={likelihood}
-          onChange={(_, v) => setLikelihood(v as number)}
-          sx={{ mb: 2 }}
-        />
-
-        <Typography fontSize={14} fontWeight="bold" color="white" gutterBottom>
-          Activities Completed
-        </Typography>
-        <Box display="flex" flexWrap="wrap" gap={1}>
-          {allActivities.map((activity) => (
-            <Chip
-              key={activity}
-              label={activity}
-              onClick={() => toggleActivity(activity)}
-              variant={selectedActivities.includes(activity) ? 'filled' : 'outlined'}
-              sx={{ color: 'white', borderColor: 'white' }}
-            />
-          ))}
+          <IconButton onClick={resetForm} sx={{ color: 'white' }}>
+            <CloseIcon />
+          </IconButton>
         </Box>
 
-        <Button fullWidth variant="contained" color="primary" sx={{ mt: 3 }} onClick={handleSubmit}>
-          Submit Reflection
-        </Button>
-      </Paper>
+        <Paper
+          sx={{
+            bgcolor: '#000',
+            border: '1px solid rgba(255,255,255,0.3)',
+            borderRadius: 2,
+            p: 2
+          }}
+        >
+          <Typography mt={2} fontSize={14} color="white">
+            {t("addRecordingsPage.titleLabel")} {title || '...'}
+          </Typography>
 
-      <Dialog open={showModal} onClose={() => setShowModal(false)}>
-        <DialogTitle sx={{ color: 'white', bgcolor: '#000' }}>Submission Error</DialogTitle>
-        <DialogContent sx={{ color: 'white', bgcolor: '#000' }}>
-          You've already submitted a reflection for today.
-        </DialogContent>
-      </Dialog>
-    </Box>
-   
+          <TextField
+            fullWidth
+            inputProps={{ maxLength: 60 }}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder={t("addRecordingsPage.titlePlaceholder")}
+            sx={{ mt: 1, mb: 2 }}
+          />
+
+          <Typography fontSize={14} fontWeight="bold" color="white" gutterBottom>
+            {t("addRecordingsPage.moodLabel")} ({mood}){t("addRecordingsPage.moodScale")} {moodEmoji(mood)}
+          </Typography>
+
+          <Slider
+            min={1}
+            max={10}
+            value={mood}
+            onChange={(_, v) => setMood(v as number)}
+            sx={{ mb: 2 }}
+          />
+
+          <Typography fontSize={14} fontWeight="bold" color="white" gutterBottom>
+            {t("addRecordingsPage.likelihoodLabel")} ({likelihood}){t("addRecordingsPage.likelihoodScale")} {likelihoodEmoji(likelihood)}
+          </Typography>
+
+          <Slider
+            min={1}
+            max={5}
+            value={likelihood}
+            onChange={(_, v) => setLikelihood(v as number)}
+            sx={{ mb: 2 }}
+          />
+
+          <Typography fontSize={14} fontWeight="bold" color="white" gutterBottom>
+            {t("addRecordingsPage.activitiesLabel")}
+          </Typography>
+
+          <Box display="flex" flexWrap="wrap" gap={1}>
+            {allActivities.map((activityObj) => (
+              <Chip
+                key={activityObj.key}
+                label={activityObj.label}
+                onClick={() => toggleActivity(activityObj.label)}
+                variant={selectedActivities.includes(activityObj.label) ? 'filled' : 'outlined'}
+                sx={{ color: 'white', borderColor: 'white' }}
+              />
+            ))}
+          </Box>
+
+          <Button
+            fullWidth
+            variant="contained"
+            color="primary"
+            sx={{ mt: 3 }}
+            onClick={handleSubmit}
+          >
+            {t("addRecordingsPage.submitButton")}
+          </Button>
+        </Paper>
+
+        <Dialog open={showModal} onClose={() => setShowModal(false)}>
+          <DialogTitle sx={{ color: 'white', bgcolor: '#000' }}>
+            {t("addRecordingsPage.modalTitle")}
+          </DialogTitle>
+          <DialogContent sx={{ color: 'white', bgcolor: '#000' }}>
+            {t("addRecordingsPage.modalMessage")}
+          </DialogContent>
+        </Dialog>
+      </Box>
     </>
   );
 }

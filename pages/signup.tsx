@@ -10,8 +10,11 @@ import { ref, set, getDatabase } from 'firebase/database';
 import { auth } from '../firebase-config';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
+import { useTranslate } from '../hooks/useTranslate'; // ← ADDED
 
 const SignupPage: React.FC = () => {
+  const t = useTranslate(); // ← TRANSLATION HOOK
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -27,7 +30,7 @@ const SignupPage: React.FC = () => {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // Create user initial data in Realtime Database
+      // Create user initial data
       const db = getDatabase();
       await set(ref(db, 'users/' + user.uid), {
         consistencyStreak: 0,
@@ -49,29 +52,31 @@ const SignupPage: React.FC = () => {
         dailyReflections: []
       });
 
-      // Send email verification
+      // Send verification email
       await sendEmailVerification(user, {
-        url: window.location.origin + '/login',  // Redirect user to login after email confirm
+        url: window.location.origin + '/login',
         handleCodeInApp: true,
       });
 
       setSuccess(true);
       setOpenSnackbar(true);
 
-      // Optional: redirect after some seconds
       setTimeout(() => {
         router.push('/login');
-      }, 10000); // 5 seconds
+      }, 10000);
+
     } catch (err: any) {
       const code = err.code;
-      const messages: { [key: string]: string } = {
-        'auth/email-already-in-use': 'Email is already in use.',
-        'auth/invalid-email': 'Invalid email format.',
-        'auth/operation-not-allowed': 'Email sign-up is currently disabled.',
-        'auth/weak-password': 'Password is too weak.',
-        'auth/too-many-requests': 'Too many attempts. Try again later.'
+
+      const messages: Record<string, string> = {
+        'auth/email-already-in-use': t("signupPage.errors.emailInUse"),
+        'auth/invalid-email': t("signupPage.errors.invalidEmail"),
+        'auth/operation-not-allowed': t("signupPage.errors.signUpDisabled"),
+        'auth/weak-password': t("signupPage.errors.weakPassword"),
+        'auth/too-many-requests': t("signupPage.errors.tooManyRequests"),
       };
-      setError(messages[code] || err.message);
+
+      setError(messages[code] ?? t("signupPage.errors.unknown"));
       setOpenSnackbar(true);
     }
   };
@@ -79,7 +84,7 @@ const SignupPage: React.FC = () => {
   return (
     <>
       <Head>
-        <title>Sign Up</title>
+        <title>{t("signupPage.title")}</title>
         <meta name="robots" content="noindex, nofollow" />
         <link rel="canonical" href="https://breakupaidkit.com/signup" />
       </Head>
@@ -88,46 +93,47 @@ const SignupPage: React.FC = () => {
         {success ? (
           <Paper elevation={3} sx={{ p: 2, borderRadius: 2, width: '100%', maxWidth: 400, margin: '0 auto' }}>
             <Typography variant="h6" fontWeight="bold" gutterBottom>
-              ✅ Next Step
+              {t("signupPage.successTitle")}
             </Typography>
+
             <Typography fontSize={14} color="text.secondary" mt={1}>
-              • Go to your email inbox<br />
-              • Check spam/promotions folder<br />
-              • The email comes from <strong>noreply@breakupaidkit.com</strong><br />
-              • Click the confirmation link<br />
-              • You'll be redirected automatically<br />
-              <br />
-              Thank you for protecting our community! 💖
+              {t("signupPage.successLine1")}<br />
+              {t("signupPage.successLine2")}<br />
+              {t("signupPage.successLine3")} <strong>noreply@breakupaidkit.com</strong><br />
+              {t("signupPage.successLine4")}<br />
+              {t("signupPage.successLine5")}<br /><br />
+              {t("signupPage.successThankYou")}
             </Typography>
+
             <Typography fontSize={14} color="text.secondary" mt={1}>
-             • You can use the Breakup Aid Kit app completely free for the first 7 days—even if you don’t buy the bundle. This first week is my little gift to you. After that the account will be deleted.
+              {t("signupPage.successTrialInfo")}
             </Typography>
           </Paper>
         ) : (
           <Paper elevation={3} sx={{ p: 2, borderRadius: 2, width: '100%', maxWidth: 400, margin: '0 auto' }}>
             <Typography variant="h6" fontWeight="bold" gutterBottom>
-              Create Your Healing Account
+              {t("signupPage.title")}
             </Typography>
 
             <TextField
-              label="Email"
+              label={t("signupPage.emailLabel")}
               variant="outlined"
               fullWidth
               margin="normal"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              helperText="We’ll send a confirmation link to this address 💌"
+              helperText={t("signupPage.emailHelper")}
             />
 
             <TextField
-              label="Password"
+              label={t("signupPage.passwordLabel")}
               variant="outlined"
               type={showPassword ? 'text' : 'password'}
               fullWidth
               margin="normal"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              helperText="Password must be at least 6 characters with letters and numbers."
+              helperText={t("signupPage.passwordHelper")}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
@@ -151,20 +157,18 @@ const SignupPage: React.FC = () => {
               onClick={handleSignUp}
               sx={{ mt: 2, fontSize: 16, fontWeight: 'bold', textTransform: 'none' }}
             >
-              Create Account
+              {t("signupPage.createAccountButton")}
             </Button>
 
             <Typography mt={2} fontSize={14} color="text.secondary">
-              Quick signup. No phone verification, no annoying personal questions!
+              {t("signupPage.quickSignupInfo")}
             </Typography>
           </Paper>
         )}
 
         <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={() => setOpenSnackbar(false)}>
           <Alert onClose={() => setOpenSnackbar(false)} severity={success ? 'success' : 'error'} sx={{ width: '100%' }}>
-            {success
-              ? '✅ Account created! Please check your email.'
-              : error}
+            {success ? t("signupPage.snackbarSuccess") : error}
           </Alert>
         </Snackbar>
       </Box>

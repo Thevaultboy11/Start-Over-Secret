@@ -1,59 +1,60 @@
-import { useState, useEffect, useRef } from 'react';
-import Head from 'next/head';
-import { useRouter } from 'next/router';
+import { useState, useEffect, useRef } from "react";
+import Head from "next/head";
+import { useRouter } from "next/router";
 import {
   Box,
   Button,
   Typography,
   Container,
-  IconButton,
-  Modal,
-  useMediaQuery,
-  useTheme,
+  Grid,
   List,
   ListItem,
   ListItemText,
+  Modal,
+  IconButton,
+  useMediaQuery,
+  useTheme,
   Paper,
-  Grid,
-} from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
-import FullscreenIcon from '@mui/icons-material/Fullscreen';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import FullscreenIcon from "@mui/icons-material/Fullscreen";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 
-/* ────────────────────────── static images ────────────────────────── */
-const screenshots = [
-  '/mobile_image/1.png',
-  '/mobile_image/2.png',
-  '/mobile_image/3.png',
-  '/mobile_image/4.png',
-];
+const screenshots = ["/mobile_image/1.png", "/mobile_image/2.png", "/mobile_image/3.png", "/mobile_image/4.png"];
 
-/* ─────────────────────────── component ───────────────────────────── */
-export default function LandingPage() {
+export default function InnerCompassLanding() {
   const router = useRouter();
   const theme = useTheme();
 
   const [open, setOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
-
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const modalRef = useRef<HTMLDivElement | null>(null);
 
-  /* ─────────────── navigation to signup (client-side push) ─────────────── */
-  const handleStartNow = () => router.push('/signup');
+  const handleGoToBooking = () => {
+    router.push("/booking-call");
+  };
+
+  const handleGoToQuiz = () => {
+    router.push("/get-back-with-ex");
+  };
+
+  const handleGoToApp = () => {
+    router.push("/signup");
+  };
 
   const handleOpen = (index: number) => {
     setSelectedIndex(index);
     setOpen(true);
   };
-  const handleClose = () => setOpen(false);
-  const nextImage = () =>
-    setSelectedIndex((prev) => (prev + 1) % screenshots.length);
-  const prevImage = () =>
-    setSelectedIndex((prev) => (prev - 1 + screenshots.length) % screenshots.length);
 
-  /* ───────────────────── swipe support for mobiles ─────────────────────── */
+  const handleClose = () => setOpen(false);
+
+  const nextImage = () => setSelectedIndex((prev) => (prev + 1) % screenshots.length);
+  const prevImage = () => setSelectedIndex((prev) => (prev - 1 + screenshots.length) % screenshots.length);
+
+  // swipe support for mobile in screenshot modal
   useEffect(() => {
     if (!open || !isMobile) return;
 
@@ -65,350 +66,639 @@ export default function LandingPage() {
     const handleTouchStart = (e: TouchEvent) => {
       touchStartX = e.changedTouches[0].screenX;
     };
+
     const handleTouchEnd = (e: TouchEvent) => {
       const touchEndX = e.changedTouches[0].screenX;
-      if (touchStartX - touchEndX > 50) nextImage();
-      if (touchEndX - touchStartX > 50) prevImage();
+      const diff = touchStartX - touchEndX;
+
+      if (diff > 50) nextImage();
+      if (diff < -50) prevImage();
     };
 
-    modal.addEventListener('touchstart', handleTouchStart);
-    modal.addEventListener('touchend', handleTouchEnd);
+    modal.addEventListener("touchstart", handleTouchStart);
+    modal.addEventListener("touchend", handleTouchEnd);
+
     return () => {
-      modal.removeEventListener('touchstart', handleTouchStart);
-      modal.removeEventListener('touchend', handleTouchEnd);
+      modal.removeEventListener("touchstart", handleTouchStart);
+      modal.removeEventListener("touchend", handleTouchEnd);
     };
   }, [open, isMobile]);
 
-  /* ───────────────────────────── render ──────────────────────────── */
   return (
     <>
       <Head>
-        <title>Start Over Secret by Alice Dautovic – Official Breakup App</title>
+        <title>Unutrašnji Kompas – 1:1 Psihoterapija, Kviz i Aplikacija</title>
         <meta
           name="description"
-          content="Struggling with a breakup? Discover Alice Dautovic’s Start Over Secret—your daily healing companion to feel whole again, one reflection at a time."
-        />
-        <meta
-          name="keywords"
-          content="start over secret by alice dautovic, alice dautovic app, alice dautovic breakup app, start over secret application, start over secret alice dautovic"
-        />
-        <link rel="canonical" href="https://breakupaidkit.com/" />
-
-        {/* Open Graph / Twitter */}
-        <meta property="og:title" content="Start Over Secret - Alice Dautovic" />
-        <meta
-          property="og:description"
-          content="Track your healing journey, resist the urge to text your ex, and rediscover your authentic self. One day at a time."
-        />
-        <meta property="og:image" content="https://breakupaidkit.com/images/og-default.png" />
-        <meta property="og:url" content="https://breakupaidkit.com/" />
-        <meta property="og:type" content="website" />
-
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Start Over Secret – Alice Dautovic" />
-        <meta
-          name="twitter:description"
-          content="Helps you reflect, grow, and resist the urge to reach out to your ex. One day at a time."
+          content="Vrati svoje samopoštovanje bez ponavljanja starih šablona u vezama. Psihoterapija, kviz o bivšem i aplikacija za praćenje iscjeljenja – na jednom mjestu."
         />
       </Head>
 
-      {/* ───────────────────────── Hero section ───────────────────────── */}
-      <Box sx={{ py: { xs: 8, sm: 10, md: 12 }, overflow: 'hidden', textAlign: {xs: 'left', sm:"center"} }}>
+      {/* 1) HERO – biggest title, centered on desktop, left on mobile */}
+      <Box
+        sx={{
+          py: { xs: 8, sm: 10, md: 12 },
+          overflow: "hidden",
+          textAlign: { xs: "left", sm: "center" },
+        }}
+      >
         <Container maxWidth="md">
           <Typography
             variant="h2"
             component="h1"
             gutterBottom
             sx={{
-              fontWeight: 'bold',
+              fontWeight: "bold",
               mb: 3,
-              lineHeight: { xs: '1.2', sm: '1.3' },
-              textAlign: { xs: 'left', sm: 'center' },
-              fontSize: { xs: '2rem', sm: '3rem', md: '3.75rem' },
+              lineHeight: { xs: 1.2, sm: 1.3 },
+              fontSize: { xs: "2.3rem", sm: "2.7rem", md: "3.1rem" },
+              textAlign: { xs: "left", sm: "center" },
             }}
           >
-            Start Over Secret by <br /> Alice Dautovic
+            Stop Reliving the Same Relationship Patterns
           </Typography>
 
-          <Typography variant="h6" color="textSecondary" sx={{ mb: 4 }}>
-            The only breakup app built for women who want to stop surviving and actually
-            start over. Track healing, resist the urge to text your ex, and stay
-            accountable with us.
-          </Typography>
-
-          <Button
-            variant="contained"
-            onClick={handleStartNow}
+          <Typography
+            variant="h6"
+            color="textSecondary"
             sx={{
-              fontSize: 16,
-              fontWeight: 'bold',
-              textTransform: 'none',
-              px: 3,
-              py: 1.2,
-              borderRadius: '999px',
-              color: 'white',
-              backgroundColor: 'rgba(255, 7, 58, 0.8)',
-              '&:hover': { backgroundColor: 'rgba(255, 7, 58, 1)' },
+              mb: 4,
+              maxWidth: 700,
+              mx: { xs: 0, sm: "auto" },
+              textAlign: { xs: "left", sm: "center" },
             }}
           >
-            Begin Now
-          </Button>
+            Let me guess you’re here because you’re tired watching self-help TikToks. New clothes or another workout won’t fix the deeper pain.
+            You deserve support that actually makes you feel like yourself again.
+          </Typography>
+
+          <Box sx={{ textAlign: { xs: "left", sm: "center" } }}>
+            <Button
+              variant="contained"
+              onClick={handleGoToBooking}
+              sx={{
+                fontSize: 16,
+                fontWeight: "bold",
+                textTransform: "none",
+                px: 3,
+                py: 1.2,
+                borderRadius: "999px",
+                color: "white",
+                backgroundColor: "rgba(255, 7, 58, 0.8)",
+                "&:hover": { backgroundColor: "rgba(255, 7, 58, 1)" },
+              }}
+            >
+              Start My Session
+            </Button>
+          </Box>
         </Container>
       </Box>
 
-      {/* ───────────────────────── Features carousel ─────────────────────── */}
-      <Box sx={{ py: 8, px: 2 }}>
+      {/* 2) PROBLEM SECTION – second biggest title, left-aligned, with CTA */}
+      <Box sx={{ py: { xs: 6, md: 8 } }}>
         <Container maxWidth="md">
-          <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 2 }}>
-            Features
-          </Typography>
-
-          <Box
+          <Typography
+            variant="h3"
             sx={{
-              display: 'flex',
-              overflowX: 'auto',
-              gap: 2,
-              pb: 2,
-              '&::-webkit-scrollbar': { display: 'none' },
+              fontWeight: "bold",
+              mb: 2,
+              fontSize: { xs: "1.9rem", md: "2.2rem" },
+              textAlign: "left",
             }}
           >
-            {screenshots.map((src, index) => {
-              const altText =
-                index === 0
-                  ? 'Start Over Secret dashboard feature'
-                  : index === 1
-                  ? 'Track progress in Start Over Secret application'
-                  : index === 2
-                  ? 'Emergency Ex Button in Alice Dautovic app'
-                  : 'Emotional Gym scenario in Start Over Secret app';
+            The Inner Compass Formula
+          </Typography>
 
-              return (
-                <Box
-                  key={src}
-                  sx={{
-                    minWidth: 200,
-                    height: 356,
-                    borderRadius: 3,
-                    backgroundImage: `url(${src})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    position: 'relative',
-                    flexShrink: 0,
-                    cursor: 'pointer',
-                  }}
-                  role="button"
-                  aria-label={`Open screenshot ${index + 1}`}
-                  onClick={() => handleOpen(index)}
+          <Typography
+            variant="body1"
+            color="textSecondary"
+            sx={{
+              mb: 5,
+              maxWidth: 720,
+              textAlign: "left",
+            }}
+          >
+I know how it feels when everything gets blurry and heavy. Self-help books helped, but they weren’t enough on their own. What moved me forward was realizing that emotional wellness depends on more than information it’s shaped by several factors.          </Typography>
+
+          <Grid container spacing={4} alignItems="flex-start">
+            {/* bullets left */}
+            <Grid size={{xs:12, md:6}}>
+              <Box>
+                <Typography
+                  variant="subtitle1"
+                  fontWeight="bold"
+                  color="textSecondary"
+                  sx={{ mb: 1, fontSize: { xs: 14, md: 15 } }}
                 >
+                  Emotional Strength Factors
+                </Typography>
+                <List dense>
+                  <ListItem>
+                    <ListItemText
+                      primaryTypographyProps={{ fontSize: 14 }}
+                      secondaryTypographyProps={{ fontSize: 13 }}
+                      primary="Breakup Knowledge"
+                      secondary="Understanding what heals and what prolongs pain."
+                    />
+                  </ListItem>
+                  <ListItem>
+                    <ListItemText
+                      primaryTypographyProps={{ fontSize: 14 }}
+                      secondaryTypographyProps={{ fontSize: 13 }}
+                      primary="Support System"
+                      secondary="Having people who listen and help you stay grounded."
+                    />
+                  </ListItem>
+                  <ListItem>
+                    <ListItemText
+                      primaryTypographyProps={{ fontSize: 14 }}
+                      secondaryTypographyProps={{ fontSize: 13 }}
+                      primary="Mental Resilience"
+                      secondary="Your ability to stay steady when emotions rise."
+                    />
+                  </ListItem>
+                </List>
+
+                <Typography
+                  variant="subtitle1"
+                  fontWeight="bold"
+                  color="textSecondary"
+                  sx={{ mt: 3, mb: 1, fontSize: { xs: 14, md: 15 } }}
+                >
+                  Emotional Drain Factors
+                </Typography>
+                <List dense>
+                  <ListItem>
+                    <ListItemText
+                      primaryTypographyProps={{ fontSize: 14 }}
+                      secondaryTypographyProps={{ fontSize: 13 }}
+                      primary="Physical Exhaustion"
+                      secondary="Feeling drained makes emotions harder to manage."
+                    />
+                  </ListItem>
+                  <ListItem>
+                    <ListItemText
+                      primaryTypographyProps={{ fontSize: 14 }}
+                      secondaryTypographyProps={{ fontSize: 13 }}
+                      primary="Emotional Turbulence"
+                      secondary="Intense, unpredictable feelings cloud your clarity."
+                    />
+                  </ListItem>
+                  <ListItem>
+                    <ListItemText
+                      primaryTypographyProps={{ fontSize: 14 }}
+                      secondaryTypographyProps={{ fontSize: 13 }}
+                      primary="Fear of Change"
+                      secondary="Worry about the unknown keeps you stuck in place."
+                    />
+                  </ListItem>
+                </List>
+              </Box>
+            </Grid>
+
+            {/* image right */}
+            <Grid size={{xs:12, md:6}}>
+              <Box sx={{ display: "flex", justifyContent: { xs: "flex-start", md: "flex-end" } }}>
+                <Box
+                  component="img"
+                  src="/inner_compass_formula.png"
+                  alt="Inner Compass emotional formula"
+                  sx={{
+                    width: { xs: 260, md: 320 },
+                    height: { xs: 260, md: 320 },
+                    borderRadius: 2,
+                    objectFit: "cover",
+                  }}
+                />
+              </Box>
+            </Grid>
+          </Grid>
+
+          <Box sx={{ mt: 4 }}>
+            <Button
+              variant="contained"
+              onClick={handleGoToBooking}
+              sx={{
+                fontSize: 15,
+                fontWeight: "bold",
+                textTransform: "none",
+                px: 3,
+                py: 1.1,
+                borderRadius: "999px",
+                color: "white",
+                backgroundColor: "rgba(255, 7, 58, 0.8)",
+                "&:hover": { backgroundColor: "rgba(255, 7, 58, 1)" },
+              }}
+            >
+                Start My Session
+            </Button>
+          </Box>
+        </Container>
+      </Box>
+
+      {/* 3) QUIZ SECTION – slightly smaller title, left-aligned, with CTA to quiz */}
+      <Box sx={{ py: { xs: 6, md: 8 } }}>
+        <Container maxWidth="md">
+          <Typography
+            variant="h3"
+            sx={{
+              fontWeight: "bold",
+              mb: 2,
+              fontSize: { xs: "1.7rem", md: "2rem" },
+              textAlign: "left",
+            }}
+          >
+            The Ex Quiz: Reality Check, Not Fantasy
+          </Typography>
+
+          <Typography
+            variant="body1"
+            color="textSecondary"
+            sx={{
+              mb: 5,
+              maxWidth: 720,
+              textAlign: "left",
+            }}
+          >
+            After a relationship ends, our brain replays only the good moments, almost like emotional withdrawal. It’s
+            easy to forget reality. That’s why I made a 25-question quiz to help you understand clearly if going back to
+            your ex is the right choice.
+          </Typography>
+
+          <Grid container spacing={4} alignItems="flex-start">
+            {/* bullets left */}
+            <Grid size={{xs:12, md:6}}>
+              <Box>
+                <Typography
+                  variant="subtitle1"
+                  fontWeight="bold"
+                  color="textSecondary"
+                  sx={{ mb: 1, fontSize: { xs: 14, md: 15 } }}
+                >
+                  What You&apos;ll Get
+                </Typography>
+                <List dense>
+                  <ListItem>
+                    <ListItemText
+                      primaryTypographyProps={{ fontSize: 14 }}
+                      primary="See your emotional blind spots clearly."
+                    />
+                  </ListItem>
+                  <ListItem>
+                    <ListItemText
+                      primaryTypographyProps={{ fontSize: 14 }}
+                      primary="Avoid getting stuck in regret or rebound cycles."
+                    />
+                  </ListItem>
+                  <ListItem>
+                    <ListItemText
+                      primaryTypographyProps={{ fontSize: 14 }}
+                      primary="Get simple next steps based on your score."
+                    />
+                  </ListItem>
+                </List>
+
+                <Typography
+                  variant="subtitle1"
+                  fontWeight="bold"
+                  color="textSecondary"
+                  sx={{ mt: 3, mb: 1, fontSize: { xs: 14, md: 15 } }}
+                >
+                  This Is Not
+                </Typography>
+                <List dense>
+                  <ListItem>
+                    <ListItemText
+                      primaryTypographyProps={{ fontSize: 14 }}
+                      primary="No email funnels and no generic answers."
+                    />
+                  </ListItem>
+                  <ListItem>
+                    <ListItemText
+                      primaryTypographyProps={{ fontSize: 14 }}
+                      primary="Your results stay anonymous and are never saved."
+                    />
+                  </ListItem>
+                </List>
+              </Box>
+            </Grid>
+
+            {/* image right */}
+            <Grid size={{xs:12, md:6}}>
+              <Box sx={{ display: "flex", justifyContent: { xs: "flex-start", md: "flex-end" } }}>
+                <Box
+                  component="img"
+                  src="/quiz_preview.png"
+                  alt="Ex quiz preview"
+                  sx={{
+                    width: { xs: 260, md: 320 },
+                    height: { xs: 260, md: 320 },
+                    borderRadius: 2,
+                    objectFit: "cover",
+                  }}
+                />
+              </Box>
+            </Grid>
+          </Grid>
+
+          <Box sx={{ mt: 4 }}>
+            <Button
+              variant="contained"
+              onClick={handleGoToQuiz}
+              sx={{
+                fontSize: 15,
+                fontWeight: "bold",
+                textTransform: "none",
+                px: 3,
+                py: 1.1,
+                borderRadius: "999px",
+                color: "white",
+                backgroundColor: "rgba(255, 7, 58, 0.8)",
+                "&:hover": { backgroundColor: "rgba(255, 7, 58, 1)" },
+              }}
+            >
+              Take the Ex Quiz
+            </Button>
+          </Box>
+        </Container>
+      </Box>
+
+      {/* 4) APPLICATION SECTION – smallest section title, app screenshots + CTA to app */}
+      <Box sx={{ py: { xs: 6, md: 8 } }}>
+        <Container maxWidth="md">
+          <Typography
+            variant="h4"
+            sx={{
+              fontWeight: "bold",
+              mb: 2,
+              fontSize: { xs: "1.5rem", md: "1.8rem" },
+              textAlign: "left",
+            }}
+          >
+            Your Healing, Inside an App
+          </Typography>
+
+          <Typography
+            variant="body1"
+            color="textSecondary"
+            sx={{
+              mb: 4,
+              maxWidth: 720,
+              textAlign: "left",
+            }}
+          >
+            Because so much of our life happens online, your healing should too. I built an app where you can track your
+            progress, practice handling uncomfortable moments, and stay connected to the little things that make you
+            feel like you again.
+          </Typography>
+
+          {/* screenshot carousel */}
+          <Box sx={{ py: 1 }}>
+            <Typography
+              variant="subtitle1"
+              sx={{
+                fontWeight: "bold",
+                mb: 2,
+                fontSize: { xs: 14, md: 15 },
+                textAlign: "left",
+              }}
+            >
+              A Glimpse Inside the App
+            </Typography>
+
+            <Box
+              sx={{
+                display: "flex",
+                overflowX: "auto",
+                gap: 2,
+                pb: 2,
+                "&::-webkit-scrollbar": { display: "none" },
+              }}
+            >
+              {screenshots.map((src, index) => {
+                const altText =
+                  index === 0
+                    ? "Inner Compass dashboard preview"
+                    : index === 1
+                    ? "Track progress inside the Inner Compass app"
+                    : index === 2
+                    ? "Emergency support feature in the app"
+                    : "Emotional practice scenario in the Inner Compass app";
+
+                return (
+                  <Box
+                    key={src}
+                    sx={{
+                      minWidth: 200,
+                      height: 356,
+                      borderRadius: 3,
+                      backgroundImage: `url(${src})`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                      position: "relative",
+                      flexShrink: 0,
+                      cursor: "pointer",
+                    }}
+                    role="button"
+                    aria-label={`Open screenshot ${index + 1}`}
+                    onClick={() => handleOpen(index)}
+                  >
+                    <IconButton
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleOpen(index);
+                      }}
+                      sx={{ position: "absolute", top: 8, right: 8, color: "#fff" }}
+                    >
+                      <FullscreenIcon />
+                    </IconButton>
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        bottom: 8,
+                        left: 8,
+                        px: 1.5,
+                        py: 0.5,
+                        borderRadius: 999,
+                        bgcolor: "rgba(0,0,0,0.6)",
+                      }}
+                    >
+                      <Typography variant="caption" sx={{ color: "#fff", fontSize: 11 }}>
+                        {altText}
+                      </Typography>
+                    </Box>
+                  </Box>
+                );
+              })}
+            </Box>
+
+            <Box sx={{ mt: 4 }}>
+              <Button
+                variant="contained"
+                onClick={handleGoToApp}
+                sx={{
+                  fontSize: 15,
+                  fontWeight: "bold",
+                  textTransform: "none",
+                  px: 3,
+                  py: 1.1,
+                  borderRadius: "999px",
+                  color: "white",
+                  backgroundColor: "rgba(255, 7, 58, 0.8)",
+                  "&:hover": { backgroundColor: "rgba(255, 7, 58, 1)" },
+                }}
+              >
+                Try the App
+              </Button>
+            </Box>
+
+            {/* fullscreen modal for screenshots */}
+            <Modal open={open} onClose={handleClose}>
+              <Box
+                ref={modalRef}
+                sx={{
+                  position: "fixed",
+                  inset: 0,
+                  backgroundColor: "rgba(0,0,0,0.9)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+                onClick={(e) => {
+                  if (e.target === e.currentTarget) handleClose();
+                }}
+              >
+                <Typography
+                  variant="subtitle2"
+                  color="white"
+                  sx={{ position: "absolute", top: 20, left: 20, fontSize: 13 }}
+                >
+                  {selectedIndex + 1}/{screenshots.length}
+                </Typography>
+
+                <IconButton
+                  onClick={handleClose}
+                  sx={{ position: "absolute", top: 20, right: 20, color: "#fff" }}
+                >
+                  <CloseIcon />
+                </IconButton>
+
+                {selectedIndex > 0 && (
                   <IconButton
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleOpen(index);
+                      prevImage();
                     }}
-                    sx={{ position: 'absolute', top: 8, right: 8, color: '#fff' }}
+                    sx={{
+                      position: "absolute",
+                      left: 32,
+                      top: "50%",
+                      color: "#fff",
+                      transform: "translateY(-50%)",
+                    }}
                   >
-                    <FullscreenIcon />
+                    <ArrowBackIosNewIcon />
                   </IconButton>
-                </Box>
-              );
-            })}
-          </Box>
+                )}
 
-          {/* ───────────────────────── Full-screen modal ───────────────────────── */}
-          <Modal open={open} onClose={handleClose}>
-            <Box
-              ref={modalRef}
-              sx={{
-                position: 'fixed',
-                inset: 0,
-                backgroundColor: 'rgba(0,0,0,0.9)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-              onClick={(e) => {
-                if (e.target === e.currentTarget) handleClose();
-              }}
-            >
-              <Typography
-                variant="h6"
-                color="white"
-                sx={{ position: 'absolute', top: 20, left: 20 }}
-              >
-                {selectedIndex + 1}/{screenshots.length}
-              </Typography>
+                <Box
+                  component="img"
+                  src={screenshots[selectedIndex]}
+                  alt={`App screenshot ${selectedIndex + 1}`}
+                  sx={{ maxHeight: "90vh", maxWidth: "90vw", borderRadius: 2 }}
+                />
 
-              <IconButton
-                onClick={handleClose}
-                sx={{ position: 'absolute', top: 20, right: 20, color: '#fff' }}
-              >
-                <CloseIcon />
-              </IconButton>
-
-              {selectedIndex > 0 && (
-                <IconButton
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    prevImage();
-                  }}
-                  sx={{
-                    position: 'absolute',
-                    left: 32,
-                    top: '50%',
-                    color: '#fff',
-                    transform: 'translateY(-50%)',
-                  }}
-                >
-                  <ArrowBackIosNewIcon />
-                </IconButton>
-              )}
-
-              <Box
-                component="img"
-                src={screenshots[selectedIndex]}
-                alt={`Screenshot ${selectedIndex + 1} – ${selectedIndex}`}
-                sx={{ maxHeight: '90vh', maxWidth: '90vw', borderRadius: 2 }}
-              />
-
-              {selectedIndex < screenshots.length - 1 && (
-                <IconButton
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    nextImage();
-                  }}
-                  sx={{
-                    position: 'absolute',
-                    right: 32,
-                    top: '50%',
-                    color: '#fff',
-                    transform: 'translateY(-50%)',
-                  }}
-                >
-                  <ArrowForwardIosIcon />
-                </IconButton>
-              )}
-            </Box>
-          </Modal>
-        </Container>
-      </Box>
-
-      {/* ───────────────────────── “Who is this for?” section ───────────────── */}
-      <Box sx={{ py: 10 }}>
-        <Container maxWidth="md">
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: { xs: 'column', md: 'row' },
-              gap: 4,
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}
-          >
-            <Box sx={{ flex: 1 }}>
-              <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 4 }}>
-                Is Start Over Secret <br /> Right for You?
-              </Typography>
-
-              <Typography variant="h6" color="textSecondary" fontWeight="bold">
-                ✅ For Women Who Want Real Emotional Progress:
-              </Typography>
-              <List dense>
-                <ListItem>
-                  <ListItemText primary="You’re ready to track your healing day by day" />
-                </ListItem>
-                <ListItem>
-                  <ListItemText primary="You’re done with vague quotes and emotional chaos" />
-                </ListItem>
-                <ListItem>
-                  <ListItemText primary="You need more than another “don’t text him” rule" />
-                </ListItem>
-              </List>
-
-              <Typography variant="h6" color="textSecondary" fontWeight="bold">
-                ✅ When You’re Done Healing Alone:
-              </Typography>
-              <List dense>
-                <ListItem>
-                  <ListItemText primary="You crave structure when your feelings are loud" />
-                </ListItem>
-                <ListItem>
-                  <ListItemText primary="You want accountability, not confusion" />
-                </ListItem>
-                <ListItem>
-                  <ListItemText primary="You’re ready to commit to yourself" />
-                </ListItem>
-                <ListItem>
-                  <ListItemText primary="Start Over Secret by Alice Dautovic was built for women just like you" />
-                </ListItem>
-              </List>
-            </Box>
-
-            <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
-              <Box
-                component="img"
-                src="/cta_image.png"
-                alt="Who is this for"
-                sx={{ width: 300, height: 300, borderRadius: 2, objectFit: 'cover' }}
-              />
-            </Box>
+                {selectedIndex < screenshots.length - 1 && (
+                  <IconButton
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      nextImage();
+                    }}
+                    sx={{
+                      position: "absolute",
+                      right: 32,
+                      top: "50%",
+                      color: "#fff",
+                      transform: "translateY(-50%)",
+                    }}
+                  >
+                    <ArrowForwardIosIcon />
+                  </IconButton>
+                )}
+              </Box>
+            </Modal>
           </Box>
         </Container>
       </Box>
 
-      {/* ───────────────────────── CTA strip ───────────────────────── */}
+      {/* FINAL CTA STRIP – styled like BreakupAid Kit CTA but for booking sessions */}
       <Container maxWidth="md" sx={{ py: 10 }}>
         <Paper
           elevation={0}
           sx={{
             p: 4,
-            border: '1px solid rgba(255, 255, 255, 0.3)',
+            border: "1px solid rgba(255, 255, 255, 0.3)",
             borderRadius: 2,
           }}
         >
-          <Grid container justifyContent="center">
+          <Grid container>
             <Grid size={{xs:12}}>
-              <Box textAlign="center">
+              <Box textAlign="left">
                 <Typography
                   variant="h5"
                   sx={{
-                    fontWeight: 'bold',
-                    fontSize: { xs: '1.75rem', sm: '2rem' },
+                    fontWeight: "bold",
+                    fontSize: { xs: "1.7rem", sm: "1.9rem" },
                     mb: 1,
                   }}
                 >
-                  Healing shouldn’t come with a price tag
+                  Ready to stop doing this alone?
                 </Typography>
 
                 <Typography
                   variant="h6"
                   color="text.secondary"
                   sx={{
-                    mb: 3,
+                    mb: 1,
                     fontWeight: 400,
-                    fontSize: { xs: '1rem', sm: '1.125rem' },
+                    fontSize: { xs: "1rem", sm: "1.05rem" },
                   }}
                 >
-                  The Start Over Secret app gives you more than journaling. Built by Alice
-                  Dautovic, this application was made to hold you accountable and help you
-                  grow—for free <i>(first 7 days)</i>.
+                  General advice won&apos;t patch the scars on your soul. In a 1:1 session, we make sense of what
+                  you&apos;re going through and decide together what actually makes sense for you.
+                </Typography>
+
+                <Typography
+                  variant="h6"
+                  color="text.secondary"
+                  sx={{
+                    my: 2,
+                    fontWeight: 400,
+                    fontSize: { xs: "1rem", sm: "1.05rem" },
+                  }}
+                >
+                  <i>
+                    If it turns out this isn&apos;t the right step for you, I&apos;ll tell you honestly — and you&apos;re
+                    free to walk away. No pressure, just clarity.
+                  </i>
                 </Typography>
 
                 <Button
                   variant="contained"
-                  onClick={handleStartNow}
+                  onClick={handleGoToBooking}
                   sx={{
                     fontSize: 16,
-                    fontWeight: 'bold',
-                    textTransform: 'none',
+                    fontWeight: "bold",
+                    textTransform: "none",
                     px: 3,
                     py: 1.2,
-                    borderRadius: '999px',
-                    color: 'white',
-                    backgroundColor: 'rgba(255, 7, 58, 0.8)',
-                    '&:hover': { backgroundColor: 'rgba(255, 7, 58, 1)' },
+                    borderRadius: "999px",
+                    color: "white",
+                    backgroundColor: "rgba(255, 7, 58, 0.8)",
+                    "&:hover": { backgroundColor: "rgba(255, 7, 58, 1)" },
                   }}
                 >
-                  Begin Now
+                  Book My Session
                 </Button>
               </Box>
             </Grid>

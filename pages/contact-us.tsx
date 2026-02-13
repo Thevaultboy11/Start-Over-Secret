@@ -10,8 +10,11 @@ import {
   Alert,
 } from '@mui/material';
 import Head from 'next/head';
+import { useTranslate } from '../hooks/useTranslate';
 
 const ContactUs = () => {
+  const t = useTranslate();
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -28,11 +31,11 @@ const ContactUs = () => {
     e.preventDefault();
 
     if (!name || !email || !comment) {
-      setError('Please fill in all required fields.');
+      setError(t("contactPage.errors.required"));
       return;
     }
     if (!validateEmail(email)) {
-      setError('Please enter a valid email address.');
+      setError(t("contactPage.errors.invalidEmail"));
       return;
     }
 
@@ -59,10 +62,10 @@ const ContactUs = () => {
         setPhone('');
         setComment('');
       } else {
-        setError('Submission failed. Please try again later.');
+        setError(t("contactPage.errors.submissionFailed"));
       }
     } catch (err) {
-      setError('Something went wrong. Please try again.');
+      setError(t("contactPage.errors.unknown"));
     } finally {
       setLoading(false);
     }
@@ -70,92 +73,93 @@ const ContactUs = () => {
 
   return (
     <>
-   <Head>
-  <link rel="canonical" href="https://breakupaidkit.com/contact-us" />
-</Head>
-    <Box p={2} pt={6} pb={10}>
-      <Typography variant="h4" fontWeight="bold" sx={{ pb: 2 }} textAlign="center" gutterBottom>
-        Contact Us
-      </Typography>
+      <Head>
+        <title>{t("contactPage.title")}</title>
+      </Head>
 
-      <Paper
-        component="form"
-        onSubmit={handleSubmit}
-        sx={{
-          bgcolor: '#000',
-          border: '1px solid rgba(255,255,255,0.3)',
-          borderRadius: 2,
-          p: 3,
-          maxWidth: 600,
-          mx: 'auto',
-        }}
-      >
-        <TextField
-          fullWidth
-          label="Name"
-          variant="outlined"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          sx={{ mb: 2 }}
-          InputLabelProps={{ style: { color: 'white' } }}
-          InputProps={{ style: { color: 'white' } }}
-          required
-        />
-        <TextField
-          fullWidth
-          label="Email"
-          variant="outlined"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          sx={{ mb: 2 }}
-          InputLabelProps={{ style: { color: 'white' } }}
-          InputProps={{ style: { color: 'white' } }}
-          required
-        />
-        <TextField
-          fullWidth
-          label="Phone Number (optional)"
-          variant="outlined"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          sx={{ mb: 2 }}
-          InputLabelProps={{ style: { color: 'white' } }}
-          InputProps={{ style: { color: 'white' } }}
-        />
-        <TextField
-          fullWidth
-          multiline
-          rows={4}
-          label="Comment"
-          variant="outlined"
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          sx={{ mb: 2 }}
-          InputLabelProps={{ style: { color: 'white' } }}
-          InputProps={{ style: { color: 'white' } }}
-          required
-        />
+      <Box p={2} pt={6} pb={10}>
+        <Typography variant="h4" fontWeight="bold" sx={{ pb: 2 }} textAlign="center" gutterBottom>
+          {t("contactPage.title")}
+        </Typography>
 
-        <Button
-          fullWidth
-          type="submit"
-          variant="contained"
-          color="primary"
-          sx={{ mt: 3 }}
-          disabled={loading}
+        <Paper
+          component="form"
+          onSubmit={handleSubmit}
+          sx={{
+            bgcolor: '#000',
+            border: '1px solid rgba(255,255,255,0.3)',
+            borderRadius: 2,
+            p: 3,
+            maxWidth: 600,
+            mx: 'auto',
+          }}
         >
-          {loading ? <CircularProgress size={24} /> : 'Send Message'}
-        </Button>
-      </Paper>
+          <TextField
+            fullWidth
+            label={t("contactPage.fields.name")}
+            variant="outlined"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            sx={{ mb: 2 }}
+            InputLabelProps={{ style: { color: 'white' } }}
+            InputProps={{ style: { color: 'white' } }}
+            required
+          />
+          <TextField
+            fullWidth
+            label={t("contactPage.fields.email")}
+            variant="outlined"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            sx={{ mb: 2 }}
+            InputLabelProps={{ style: { color: 'white' } }}
+            InputProps={{ style: { color: 'white' } }}
+            required
+          />
+          <TextField
+            fullWidth
+            label={t("contactPage.fields.phone")}
+            variant="outlined"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            sx={{ mb: 2 }}
+            InputLabelProps={{ style: { color: 'white' } }}
+            InputProps={{ style: { color: 'white' } }}
+          />
+          <TextField
+            fullWidth
+            multiline
+            rows={4}
+            label={t("contactPage.fields.comment")}
+            variant="outlined"
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            sx={{ mb: 2 }}
+            InputLabelProps={{ style: { color: 'white' } }}
+            InputProps={{ style: { color: 'white' } }}
+            required
+          />
 
-      <Snackbar open={!!error} autoHideDuration={6000} onClose={() => setError('')}>
-        <Alert severity="error">{error}</Alert>
-      </Snackbar>
+          <Button
+            fullWidth
+            type="submit"
+            variant="contained"
+            color="primary"
+            sx={{ mt: 3 }}
+            disabled={loading}
+          >
+            {loading ? <CircularProgress size={24} /> : t("contactPage.submitButton")}
+          </Button>
+        </Paper>
 
-      <Snackbar open={success} autoHideDuration={6000} onClose={() => setSuccess(false)}>
-        <Alert severity="success">Message sent successfully!</Alert>
-      </Snackbar>
-    </Box>
+        <Snackbar open={!!error} autoHideDuration={6000} onClose={() => setError('')}>
+          <Alert severity="error">{error}</Alert>
+        </Snackbar>
+
+        <Snackbar open={success} autoHideDuration={6000} onClose={() => setSuccess(false)}>
+          <Alert severity="success">{t("contactPage.successMessage")}</Alert>
+        </Snackbar>
+      </Box>
     </>
   );
 };

@@ -4,8 +4,11 @@ import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../firebase-config';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
+import { useTranslate } from '../hooks/useTranslate';
 
 const ForgotPasswordPage: React.FC = () => {
+  const t = useTranslate();
+
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const [severity, setSeverity] = useState<'success' | 'error' | 'info'>('info');
@@ -16,51 +19,49 @@ const ForgotPasswordPage: React.FC = () => {
   const handleReset = async () => {
     try {
       await sendPasswordResetEmail(auth, email, {
-        url: window.location.origin + '/login', // After password reset, they go to login
+        url: window.location.origin + '/login',
         handleCodeInApp: true,
       });
-      setMessage('✅ Password reset email sent! Check your inbox.');
+
+      setMessage(t("forgotPasswordPage.messages.success"));
       setSeverity('success');
       setOpenSnackbar(true);
+
     } catch (error: any) {
       const code = error.code;
-      const messages: { [key: string]: string } = {
-        'auth/user-not-found': 'No user found with this email.',
-        'auth/invalid-email': 'Invalid email address format.',
-        'auth/too-many-requests': 'Too many requests. Please try again later.'
+
+      const messages: Record<string, string> = {
+        'auth/user-not-found': t("forgotPasswordPage.messages.userNotFound"),
+        'auth/invalid-email': t("forgotPasswordPage.messages.invalidEmail"),
+        'auth/too-many-requests': t("forgotPasswordPage.messages.tooManyRequests"),
       };
-      setMessage(messages[code] || error.message);
+
+      setMessage(messages[code] ?? t("forgotPasswordPage.messages.unknown"));
       setSeverity('error');
       setOpenSnackbar(true);
     }
   };
 
-  const handleCloseSnackbar = () => {
-    setOpenSnackbar(false);
-  };
-
   return (
     <>
       <Head>
-        <title>Forgot Password</title>
-        <meta name="robots" content="noindex, nofollow" />
-        <link rel="canonical" href="https://breakupaidkit.com/forgot-password" />
+        <title>{t("forgotPasswordPage.title")}</title>
       </Head>
 
       <Box p={2} pt={3}>
         <Paper elevation={3} sx={{ p: 2, borderRadius: 2, width: '100%', maxWidth: 400, margin: '0 auto' }}>
           <Typography variant="h6" fontWeight="bold" gutterBottom>
-            Forgot Your Password?
+            {t("forgotPasswordPage.heading")}
           </Typography>
 
           <TextField
-            label="Email"
+            label={t("forgotPasswordPage.emailLabel")}
             variant="outlined"
             fullWidth
             margin="normal"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            helperText="We'll send you a link to reset it 📩"
+            helperText={t("forgotPasswordPage.emailHelper")}
           />
 
           <Button
@@ -69,16 +70,16 @@ const ForgotPasswordPage: React.FC = () => {
             onClick={handleReset}
             sx={{ mt: 2, fontSize: 16, fontWeight: 'bold', textTransform: 'none' }}
           >
-            Send Reset Link
+            {t("forgotPasswordPage.resetButton")}
           </Button>
 
           <Typography mt={2} fontSize={14} color="text.secondary">
-            We'll never spam you. 💖
+            {t("forgotPasswordPage.noSpamText")}
           </Typography>
         </Paper>
 
-        <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
-          <Alert onClose={handleCloseSnackbar} severity={severity} sx={{ width: '100%' }}>
+        <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={() => setOpenSnackbar(false)}>
+          <Alert onClose={() => setOpenSnackbar(false)} severity={severity} sx={{ width: '100%' }}>
             {message}
           </Alert>
         </Snackbar>

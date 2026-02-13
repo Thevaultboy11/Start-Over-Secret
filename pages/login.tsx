@@ -19,10 +19,12 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 
 import { auth } from '../firebase-config';
 import { useAuth } from '../context/AuthContext';
+import { useTranslate } from '../hooks/useTranslate';  // ← ADD THIS
 
 const Login: React.FC = () => {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const t = useTranslate();              // ← TRANSLATION HOOK
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -45,27 +47,26 @@ const Login: React.FC = () => {
       await cred.user.reload();
 
       if (!cred.user.emailVerified) {
-        setMessage(
-          '⚠️ You need to confirm your email before logging in. Check your inbox or spam folder.',
-        );
+        setMessage(t("loginPage.needEmailVerification"));
         setSeverity('warning');
         setOpenSnackbar(true);
         return;
       }
 
-      setMessage('🎉 Login successful!');
+      setMessage(t("loginPage.loginSuccess"));
       setSeverity('success');
       setOpenSnackbar(true);
       router.push('/dashboard');
     } catch (err: any) {
-      const friendly: Record<string, string> = {
-        'auth/wrong-password': 'Incorrect password.',
-        'auth/user-not-found': 'No account found with this email.',
-        'auth/invalid-email': 'Invalid email address.',
-        'auth/user-disabled': 'This account has been disabled.',
-        'auth/too-many-requests': 'Too many attempts. Please try again later.',
+      const errorMap: Record<string, string> = {
+        'auth/wrong-password': t("loginPage.errors.wrongPassword"),
+        'auth/user-not-found': t("loginPage.errors.userNotFound"),
+        'auth/invalid-email': t("loginPage.errors.invalidEmail"),
+        'auth/user-disabled': t("loginPage.errors.userDisabled"),
+        'auth/too-many-requests': t("loginPage.errors.tooManyRequests"),
       };
-      setMessage(friendly[err.code] ?? err.message);
+
+      setMessage(errorMap[err.code] ?? t("loginPage.errors.unknown"));
       setSeverity('error');
       setOpenSnackbar(true);
     }
@@ -75,7 +76,7 @@ const Login: React.FC = () => {
   return (
     <>
       <Head>
-        <title>Login</title>
+        <title>{t("loginPage.title")}</title>
         <meta name="robots" content="noindex,nofollow" />
         <link rel="canonical" href="https://breakupaidkit.com/login" />
       </Head>
@@ -92,16 +93,17 @@ const Login: React.FC = () => {
           }}
         >
           <Typography variant="h6" fontWeight="bold" gutterBottom>
-            Log In
+            {t("loginPage.title")}
           </Typography>
 
           <Typography fontSize={14} color="text.secondary" mb={2}>
-            First time logging in?
-            <br /> You must confirm your email before using the app.
+            {t("loginPage.instructionsLine1")}
+            <br />
+            {t("loginPage.instructionsLine2")}
           </Typography>
 
           <TextField
-            label="Email"
+            label={t("loginPage.emailLabel")}
             variant="outlined"
             fullWidth
             margin="normal"
@@ -110,7 +112,7 @@ const Login: React.FC = () => {
           />
 
           <TextField
-            label="Password"
+            label={t("loginPage.passwordLabel")}
             variant="outlined"
             type={showPassword ? 'text' : 'password'}
             fullWidth
@@ -132,42 +134,49 @@ const Login: React.FC = () => {
             }}
           />
 
-          {/* ─────────── navigation links (Next.js <Link>) ─────────── */}
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", paddingBottom: "5px" }}>
-  <Link href="/register" passHref>
-    <Typography
-      component="a"
-      fontSize={14}
-      fontWeight="bold"
-      mt={1}
-      mb={2}
-      sx={{ color: '#fff', textDecoration: 'underline' }}
-    >
-      Did Not Create Account?
-    </Typography>
-  </Link>
+          {/* ─────────── navigation links ─────────── */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-end",
+              paddingBottom: "5px"
+            }}
+          >
+            <Link href="/signup" passHref>
+              <Typography
+                component="a"
+                fontSize={14}
+                fontWeight="bold"
+                mt={1}
+                mb={2}
+                sx={{ color: '#fff', textDecoration: 'underline' }}
+              >
+                {t("loginPage.didNotCreateAccount")}
+              </Typography>
+            </Link>
 
-  <Link href="/forgot-password" passHref>
-    <Typography
-      component="a"
-      fontSize={14}
-      fontWeight="bold"
-      mt={1}
-      mb={2}
-      sx={{ color: '#fff', textDecoration: 'underline' }}
-    >
-      Forgot Password?
-    </Typography>
-  </Link>
-</div>
-          
+            <Link href="/forgot-password" passHref>
+              <Typography
+                component="a"
+                fontSize={14}
+                fontWeight="bold"
+                mt={1}
+                mb={2}
+                sx={{ color: '#fff', textDecoration: 'underline' }}
+              >
+                {t("loginPage.forgotPassword")}
+              </Typography>
+            </Link>
+          </div>
+
           <Button
             variant="contained"
             fullWidth
             onClick={handleLogin}
             sx={{ fontSize: 16, fontWeight: 'bold' }}
           >
-            Log In
+            {t("loginPage.loginButton")}
           </Button>
         </Paper>
 

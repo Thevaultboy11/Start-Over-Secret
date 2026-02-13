@@ -1,4 +1,3 @@
-// components/BottomNav.tsx
 'use client';
 
 import { BottomNavigation, BottomNavigationAction, Paper } from "@mui/material";
@@ -8,8 +7,10 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { useAuth } from "../context/AuthContext";
 import { usePathname, useRouter } from "next/navigation";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import { useTranslate } from "../hooks/useTranslate";  // ★ ADDED
 
 export default function BottomNav() {
+  const t = useTranslate(); // ★ ADDED
   const isMobile = useMediaQuery("(max-width:600px)");
   const { user } = useAuth();
   const router = useRouter();
@@ -51,10 +52,13 @@ export default function BottomNav() {
           router.push(indexToPath[newValue]);
         }}
       >
+        {/* Emotional Gym */}
         <BottomNavigationAction
-          label="Emotional Gym"
+          label={t("bottomNav.emotionalGym")}   // ★ UPDATED
           icon={<FavoriteIcon fontSize="medium" />}
         />
+
+        {/* Middle add button (no label needed) */}
         <BottomNavigationAction
           label=""
           icon={
@@ -70,8 +74,10 @@ export default function BottomNav() {
             />
           }
         />
+
+        {/* Dashboard */}
         <BottomNavigationAction
-          label="Dashboard"
+          label={t("bottomNav.dashboard")}   // ★ UPDATED
           icon={<DashboardIcon fontSize="medium" />}
         />
       </BottomNavigation>

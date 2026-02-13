@@ -1,4 +1,3 @@
-// components/TopNav.tsx
 'use client';
 
 import {
@@ -24,9 +23,11 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import '@fontsource/poppins/700.css';
+import { useTranslate } from "../hooks/useTranslate";  // ★ ADDED
 
 export default function TopNav() {
   const { user, logout } = useAuth();
+  const t = useTranslate(); // ★ ADDED
   const isMobile = useMediaQuery('(max-width:600px)');
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [showBanner, setShowBanner] = useState(false);
@@ -34,10 +35,7 @@ export default function TopNav() {
   const router = useRouter();
 
   const handleLogoClick = () => {
-    if (isMobile) {
-    } else {
-      router.push(user ? '/dashboard' : '/');
-    }
+    if (!isMobile) router.push(user ? '/dashboard' : '/');
   };
 
   useEffect(() => {
@@ -50,11 +48,12 @@ export default function TopNav() {
     sessionStorage.setItem('hideTelegramBanner', 'true');
   };
 
+  // ★ TRANSLATED NAV ITEMS
   const drawerLinks = [
-    { label: 'Home', path: '/' },
-    { label: 'Breakup Aid Kit', external: false, path: '/breakup-aid-kit' },
-    { label: 'Get Back With Ex?', path: '/get-back-with-ex' },
-    { label: 'Contact Us', path: '/contact-us' },
+    { label: t("topNav.links.home"), path: '/' },
+    { label: t("topNav.links.breakupAidKit"), external: false, path: '/breakup-aid-kit' },
+    { label: t("topNav.links.getBackWithEx"), path: '/get-back-with-ex' },
+    { label: t("topNav.links.contactUs"), path: '/contact-us' },
   ];
 
   return (
@@ -100,14 +99,14 @@ export default function TopNav() {
                 transition: "color 0.3s ease",
               }}
             >
-              StartOverSecret
+              {t("topNav.brand")}
             </Typography>
           </Box>
 
           {/* Desktop Links */}
           {!isMobile && (
             <Box display="flex" gap={3}>
-              {drawerLinks.map((link) => (
+              {drawerLinks.map((link) =>
                 link.external ? (
                   <Button
                     key={link.label}
@@ -135,7 +134,7 @@ export default function TopNav() {
                     </Button>
                   </Link>
                 )
-              ))}
+              )}
             </Box>
           )}
 
@@ -165,7 +164,7 @@ export default function TopNav() {
                 },
               }}
             >
-              Logout
+              {t("topNav.auth.logout")}
             </Button>
           ) : (
             <Box display="flex" gap={2}>
@@ -189,9 +188,10 @@ export default function TopNav() {
                     },
                   }}
                 >
-                  Sign In
+                  {t("topNav.auth.signIn")}
                 </Button>
               </Link>
+
               <Link href="/signup" passHref legacyBehavior>
                 <Button
                   variant="outlined"
@@ -212,7 +212,7 @@ export default function TopNav() {
                     },
                   }}
                 >
-                  Sign Up
+                  {t("topNav.auth.signUp")}
                 </Button>
               </Link>
             </Box>
@@ -241,7 +241,7 @@ export default function TopNav() {
             onClick={() => router.push('/breakup-aid-kit')}
             sx={{ cursor: 'pointer', fontWeight: 'bold', textDecoration: 'underline' }}
           >
-            Healing apps help... but heartbreak needs more than just tracking feelings.
+            {t("topNav.banner.message")}
           </Typography>
           <IconButton onClick={handleDismissBanner} sx={{ position: 'absolute', right: 8, top: 4 }}>
             <CloseIcon sx={{ color: 'white', fontSize: 20 }} />
@@ -300,7 +300,7 @@ export default function TopNav() {
                 }}
                 sx={{ fontWeight: 'bold', fontSize: 18, textTransform: 'none', color: 'white', borderColor: 'white', mt: 4 }}
               >
-                Logout
+                {t("topNav.auth.logout")}
               </Button>
             ) : (
               <Box mt={3} display="flex" flexDirection="column" gap={2}>
@@ -313,8 +313,9 @@ export default function TopNav() {
                   }}
                   sx={{ fontWeight: 'bold', fontSize: 16, textTransform: 'none' }}
                 >
-                  Sign In
+                  {t("topNav.auth.signIn")}
                 </Button>
+
                 <Button
                   variant="outlined"
                   fullWidth
@@ -324,7 +325,7 @@ export default function TopNav() {
                   }}
                   sx={{ fontWeight: 'bold', fontSize: 16, textTransform: 'none', borderColor: 'white', color: 'white' }}
                 >
-                  Sign Up
+                  {t("topNav.auth.signUp")}
                 </Button>
               </Box>
             )}

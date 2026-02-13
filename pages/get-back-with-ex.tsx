@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   Chart as ChartJS,
   /* controllers we actually use */
@@ -32,6 +32,8 @@ import {
 } from '@mui/material';
 import Head from 'next/head';
 import Router, { useRouter } from 'next/router';
+import { questionsBS, questionsEN } from '../data/getBackWithEx';
+import { LanguageContext } from '@/context/LanguageContext';
 /* ------------------------------------------------------------------ */
 /*  Chart.js – one‑time global registration                           */
 /* ------------------------------------------------------------------ */
@@ -121,33 +123,6 @@ interface ResultPayload {
 /* ------------------------------------------------------------------ */
 /*  Question list                                                     */
 /* ------------------------------------------------------------------ */
-const questions: Question[] = [
-  { id: 'q1_loveEx', factor: 'ER', text: 'Do you still love your ex?', type: 'radio', options: ['Yes', 'Some', 'Unsure', 'No'] },
-  { id: 'q2_missScale', factor: 'ER', text: 'On a scale of 1‑10, how much do you miss them?', type: 'slider' },
-  { id: 'q3_thinkFrequency', factor: 'ER', text: 'How often do you think about your ex?', type: 'radio', options: ['Never', 'Occasionally', 'A lot', 'Constantly'] },
-  { id: 'q4_feelingOnSeeing', factor: 'ER', text: 'How do you feel when you see (or imagine) them?', type: 'radio', options: ['Happy', 'Sad', 'Angry', 'Neutral'] },
-  { id: 'q5_datingDifficulty', factor: 'ER', text: 'How difficult is it to date someone new?', type: 'radio', options: ['Not difficult', 'Challenging', "Haven’t tried"] },
-  { id: 'q6_issuesResolved', factor: 'TPI', text: 'Have the breakup issues been resolved?', type: 'radio', options: ['Yes', 'Partly', 'No'] },
-  { id: 'q7_ownPart', factor: 'TPI', text: 'Do you both own your part in what went wrong?', type: 'radio', options: ['Yes', 'Partly', 'No'] },
-  { id: 'q8_problemsSolvable', factor: 'TPI', text: 'Can the old problems be solved now?', type: 'radio', options: ['Yes', 'Maybe', 'No'] },
-  { id: 'q9_trustEase', factor: 'TPI', text: 'How easy would it be to trust your ex again?', type: 'radio', options: ['Can trust', 'Tough', 'Unsure'] },
-  { id: 'q10_abuse', factor: 'TPI', text: 'Was there any abuse in the past?', type: 'radio', options: ['No', 'Isolated incident', 'Yes'] },
-  { id: 'q11_argumentFreq', factor: 'CD', text: 'How often did you argue?', type: 'radio', options: ['Rarely', 'Sometimes', 'Often', 'Constantly'] },
-  { id: 'q12_toxicity', factor: 'CD', text: 'Toxic behaviours or red flags?', type: 'radio', options: ['No', 'Some', 'Yes'] },
-  { id: 'q13_sharedValues', factor: 'CD', text: 'Shared values & long‑term goals?', type: 'radio', options: ['Yes', 'Partly', 'No'] },
-  { id: 'q14_bestVersion', factor: 'CD', text: 'Did the relationship bring out the best in you?', type: 'radio', options: ['Yes', 'Neutral', 'No'] },
-  { id: 'q15_initiator', factor: 'CD', text: 'Who ended the relationship?', type: 'radio', options: ['I did', 'Mutual', 'My ex'] },
-  { id: 'q16_selfFocus', factor: 'PG', text: 'Your focus since the breakup?', type: 'radio', options: ['Self‑growth', 'Distraction', 'No change'] },
-  { id: 'q17_exGrowth', factor: 'PG', text: 'Has your ex shown personal growth?', type: 'radio', options: ['Yes', 'Maybe', 'No'] },
-  { id: 'q18_betterPartner', factor: 'PG', text: 'Would you be a better partner now?', type: 'radio', options: ['Yes', 'Maybe', 'No'] },
-  { id: 'q19_bothGrown', factor: 'PG', text: 'Have both of you grown emotionally?', type: 'radio', options: ['Yes', 'Partly', 'Not really'] },
-  { id: 'q20_confidenceNoRepeat', factor: 'PG', text: 'Confidence the same mistakes won’t repeat?', type: 'radio', options: ['Yes', 'Not sure', 'No'] },
-  { id: 'q21_lastContact', factor: 'EF', text: 'Time since last contact with your ex?', type: 'radio', options: ['< 1 week', '1‑4 wks', '1‑3 mths', '> 3 mths'] },
-  { id: 'q22_socialOpinion', factor: 'EF', text: 'Friends & family opinion of reconciling?', type: 'radio', options: ['Supportive', 'Mixed', 'Against'] },
-  { id: 'q23_pressure', factor: 'EF', text: 'Do you feel pressured to reconcile?', type: 'radio', options: ['No', 'A little', 'Yes'] },
-  { id: 'q24_externalTies', factor: 'EF', text: 'External circumstances tying you together?', type: 'radio', options: ['Yes', 'Some', 'No'] },
-  { id: 'q25_willingEffort', factor: 'EF', text: 'Are you willing to invest the effort to rebuild?', type: 'radio', options: ['Yes', 'I’ll try', 'Unsure'] },
-];
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                           */
@@ -197,7 +172,10 @@ export default function GetBackWithEx() {
   const [stage, setStage] = useState<Stage>('start');
   const [responses, setResponses] = useState<Responses>({});
   const [result, setResult] = useState<ResultPayload | null>(null);
-
+  const { language } = useContext(LanguageContext);
+  const questions: Question[] =  language === "bs" ? questionsBS : questionsEN;
+  
+  
   /* -------------- handlers -------------- */
   const handleRadioChange  = (id: keyof Responses, v: string) =>
     setResponses((p) => ({ ...p, [id]: v }));
