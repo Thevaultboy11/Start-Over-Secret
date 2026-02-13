@@ -7,13 +7,13 @@ export interface BookingCallContent {
   whyConsultations: {
     title: string;
     paragraphs: string[];
+    button: string;
   };
   trust: {
     title: string;
     name: string;
     bullets: string[];
   };
-  calendlyTitle: string;
 }
 
 export const bookingCallContentEN: BookingCallContent = {
@@ -32,6 +32,7 @@ export const bookingCallContentEN: BookingCallContent = {
       "Healing begins when we choose to face our pain. For me, that journey began in therapy. I went from crying every day to finding joy again — laughing with my kids, living life like I was in my teens again.",
       "So that is the only way I can help you move from a bad place, or even better get from a good place to an even better one!",
     ],
+    button: "Reserve on Calendly",
   },
   trust: {
     title: "Why Would You Trust Me?",
@@ -43,7 +44,6 @@ export const bookingCallContentEN: BookingCallContent = {
       "10+ satisfied therapy and coaching clients",
     ],
   },
-  calendlyTitle: "Book your consultation",
 };
 
 export const bookingCallContentBS: BookingCallContent = {
@@ -62,6 +62,7 @@ export const bookingCallContentBS: BookingCallContent = {
       "Iscjeljenje počinje kada odlučimo da se suočimo sa svojom boli. Za mene je taj put počeo terapijom. Od svakodnevnog plakanja došla sam do toga da opet osjećam radost — smijem se sa svojom djecom i živim kao u tinejdžerskim danima.",
       "To je jedini način na koji ti mogu pomoći da pređeš iz lošeg stanja, ili još bolje — iz dobrog u još bolje!",
     ],
+    button: "Rezerviši termin na Calendly",
   },
   trust: {
     title: "Zašto bi mi vjerovala?",
@@ -73,7 +74,6 @@ export const bookingCallContentBS: BookingCallContent = {
       "10+ zadovoljnih klijenata u terapiji i coachingu",
     ],
   },
-  calendlyTitle: "Zakaži konsultacije",
 };
 
-export const calendlyBookingLink = "https://calendly.com/dzananovicelma83";
+export const calendlyBookingLink = "https://calendly.com/dzananovicelma83/30min";
