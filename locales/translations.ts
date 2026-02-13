@@ -113,11 +113,11 @@ export const translations = {
 
     /* ───────────── TOP NAVIGATION ───────────── */
     topNav: {
-      brand: "StartOverSecret",
+      brand: "UnutrasnjiKompas",
 
       links: {
         home: "Home",
-        breakupAidKit: "Breakup Aid Kit",
+        bookingCall: "Book a Session",
         getBackWithEx: "Get Back With Ex?",
         contactUs: "Contact Us",
       },
@@ -129,7 +129,7 @@ export const translations = {
       },
 
       banner: {
-        message: "Healing apps help... but heartbreak needs more than just tracking feelings.",
+        message: "Ready for 1:1 guidance? Book your consultation with Elma.",
       },
     },
     dashboardPage: {
@@ -410,11 +410,11 @@ export const translations = {
 
     /* ───────────── TOP NAVIGATION ───────────── */
     topNav: {
-      brand: "StartOverSecret",
+      brand: "UnutrasnjiKompas",
 
       links: {
         home: "Početna",
-        breakupAidKit: "Breakup Aid Kit",
+        bookingCall: "Zakaži sastanak",
         getBackWithEx: "Vratiti se s bivšim?",
         contactUs: "Kontaktirajte Nas",
       },
@@ -426,8 +426,7 @@ export const translations = {
       },
 
       banner: {
-        message:
-          "Aplikacije za iscjeljenje pomažu... ali slomljeno srce traži više od praćenja osjećaja.",
+        message: "Spremna za 1:1 podršku? Zakaži konsultacije sa Elmom.",
       },
     },
   },

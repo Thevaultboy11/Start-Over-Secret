@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import {
@@ -20,12 +20,16 @@ import CloseIcon from "@mui/icons-material/Close";
 import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import { LanguageContext } from "@/context/LanguageContext";
+import { indexPageContentBS, indexPageContentEN } from "@/data/indexPageContent";
 
 const screenshots = ["/mobile_image/1.png", "/mobile_image/2.png", "/mobile_image/3.png", "/mobile_image/4.png"];
 
 export default function InnerCompassLanding() {
   const router = useRouter();
   const theme = useTheme();
+  const { language } = useContext(LanguageContext);
+  const content = language === "bs" ? indexPageContentBS : indexPageContentEN;
 
   const [open, setOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -87,11 +91,8 @@ export default function InnerCompassLanding() {
   return (
     <>
       <Head>
-        <title>Unutrašnji Kompas – 1:1 Psihoterapija, Kviz i Aplikacija</title>
-        <meta
-          name="description"
-          content="Vrati svoje samopoštovanje bez ponavljanja starih šablona u vezama. Psihoterapija, kviz o bivšem i aplikacija za praćenje iscjeljenja – na jednom mjestu."
-        />
+        <title>{content.head.title}</title>
+        <meta name="description" content={content.head.description} />
       </Head>
 
       {/* 1) HERO – biggest title, centered on desktop, left on mobile */}
@@ -115,7 +116,7 @@ export default function InnerCompassLanding() {
               textAlign: { xs: "left", sm: "center" },
             }}
           >
-            Stop Reliving the Same Relationship Patterns
+            {content.hero.title}
           </Typography>
 
           <Typography
@@ -128,8 +129,7 @@ export default function InnerCompassLanding() {
               textAlign: { xs: "left", sm: "center" },
             }}
           >
-            Let me guess you’re here because you’re tired watching self-help TikToks. New clothes or another workout won’t fix the deeper pain.
-            You deserve support that actually makes you feel like yourself again.
+            {content.hero.description}
           </Typography>
 
           <Box sx={{ textAlign: { xs: "left", sm: "center" } }}>
@@ -148,7 +148,7 @@ export default function InnerCompassLanding() {
                 "&:hover": { backgroundColor: "rgba(255, 7, 58, 1)" },
               }}
             >
-              Start My Session
+              {content.hero.cta}
             </Button>
           </Box>
         </Container>
@@ -166,7 +166,7 @@ export default function InnerCompassLanding() {
               textAlign: "left",
             }}
           >
-            The Inner Compass Formula
+            {content.formula.title}
           </Typography>
 
           <Typography
@@ -178,7 +178,8 @@ export default function InnerCompassLanding() {
               textAlign: "left",
             }}
           >
-I know how it feels when everything gets blurry and heavy. Self-help books helped, but they weren’t enough on their own. What moved me forward was realizing that emotional wellness depends on more than information it’s shaped by several factors.          </Typography>
+            {content.formula.description}
+          </Typography>
 
           <Grid container spacing={4} alignItems="flex-start">
             {/* bullets left */}
@@ -190,33 +191,19 @@ I know how it feels when everything gets blurry and heavy. Self-help books helpe
                   color="textSecondary"
                   sx={{ mb: 1, fontSize: { xs: 14, md: 15 } }}
                 >
-                  Emotional Strength Factors
+                  {content.formula.strengthTitle}
                 </Typography>
                 <List dense>
-                  <ListItem>
-                    <ListItemText
-                      primaryTypographyProps={{ fontSize: 14 }}
-                      secondaryTypographyProps={{ fontSize: 13 }}
-                      primary="Breakup Knowledge"
-                      secondary="Understanding what heals and what prolongs pain."
-                    />
-                  </ListItem>
-                  <ListItem>
-                    <ListItemText
-                      primaryTypographyProps={{ fontSize: 14 }}
-                      secondaryTypographyProps={{ fontSize: 13 }}
-                      primary="Support System"
-                      secondary="Having people who listen and help you stay grounded."
-                    />
-                  </ListItem>
-                  <ListItem>
-                    <ListItemText
-                      primaryTypographyProps={{ fontSize: 14 }}
-                      secondaryTypographyProps={{ fontSize: 13 }}
-                      primary="Mental Resilience"
-                      secondary="Your ability to stay steady when emotions rise."
-                    />
-                  </ListItem>
+                  {content.formula.strengthItems.map((item) => (
+                    <ListItem key={item.primary}>
+                      <ListItemText
+                        primaryTypographyProps={{ fontSize: 14 }}
+                        secondaryTypographyProps={{ fontSize: 13 }}
+                        primary={item.primary}
+                        secondary={item.secondary}
+                      />
+                    </ListItem>
+                  ))}
                 </List>
 
                 <Typography
@@ -225,33 +212,19 @@ I know how it feels when everything gets blurry and heavy. Self-help books helpe
                   color="textSecondary"
                   sx={{ mt: 3, mb: 1, fontSize: { xs: 14, md: 15 } }}
                 >
-                  Emotional Drain Factors
+                  {content.formula.drainTitle}
                 </Typography>
                 <List dense>
-                  <ListItem>
-                    <ListItemText
-                      primaryTypographyProps={{ fontSize: 14 }}
-                      secondaryTypographyProps={{ fontSize: 13 }}
-                      primary="Physical Exhaustion"
-                      secondary="Feeling drained makes emotions harder to manage."
-                    />
-                  </ListItem>
-                  <ListItem>
-                    <ListItemText
-                      primaryTypographyProps={{ fontSize: 14 }}
-                      secondaryTypographyProps={{ fontSize: 13 }}
-                      primary="Emotional Turbulence"
-                      secondary="Intense, unpredictable feelings cloud your clarity."
-                    />
-                  </ListItem>
-                  <ListItem>
-                    <ListItemText
-                      primaryTypographyProps={{ fontSize: 14 }}
-                      secondaryTypographyProps={{ fontSize: 13 }}
-                      primary="Fear of Change"
-                      secondary="Worry about the unknown keeps you stuck in place."
-                    />
-                  </ListItem>
+                  {content.formula.drainItems.map((item) => (
+                    <ListItem key={item.primary}>
+                      <ListItemText
+                        primaryTypographyProps={{ fontSize: 14 }}
+                        secondaryTypographyProps={{ fontSize: 13 }}
+                        primary={item.primary}
+                        secondary={item.secondary}
+                      />
+                    </ListItem>
+                  ))}
                 </List>
               </Box>
             </Grid>
@@ -290,7 +263,7 @@ I know how it feels when everything gets blurry and heavy. Self-help books helpe
                 "&:hover": { backgroundColor: "rgba(255, 7, 58, 1)" },
               }}
             >
-                Start My Session
+              {content.formula.cta}
             </Button>
           </Box>
         </Container>
@@ -308,7 +281,7 @@ I know how it feels when everything gets blurry and heavy. Self-help books helpe
               textAlign: "left",
             }}
           >
-            The Ex Quiz: Reality Check, Not Fantasy
+            {content.quiz.title}
           </Typography>
 
           <Typography
@@ -320,9 +293,7 @@ I know how it feels when everything gets blurry and heavy. Self-help books helpe
               textAlign: "left",
             }}
           >
-            After a relationship ends, our brain replays only the good moments, almost like emotional withdrawal. It’s
-            easy to forget reality. That’s why I made a 25-question quiz to help you understand clearly if going back to
-            your ex is the right choice.
+            {content.quiz.description}
           </Typography>
 
           <Grid container spacing={4} alignItems="flex-start">
@@ -335,27 +306,17 @@ I know how it feels when everything gets blurry and heavy. Self-help books helpe
                   color="textSecondary"
                   sx={{ mb: 1, fontSize: { xs: 14, md: 15 } }}
                 >
-                  What You&apos;ll Get
+                  {content.quiz.getTitle}
                 </Typography>
                 <List dense>
-                  <ListItem>
-                    <ListItemText
-                      primaryTypographyProps={{ fontSize: 14 }}
-                      primary="See your emotional blind spots clearly."
-                    />
-                  </ListItem>
-                  <ListItem>
-                    <ListItemText
-                      primaryTypographyProps={{ fontSize: 14 }}
-                      primary="Avoid getting stuck in regret or rebound cycles."
-                    />
-                  </ListItem>
-                  <ListItem>
-                    <ListItemText
-                      primaryTypographyProps={{ fontSize: 14 }}
-                      primary="Get simple next steps based on your score."
-                    />
-                  </ListItem>
+                  {content.quiz.getItems.map((item) => (
+                    <ListItem key={item}>
+                      <ListItemText
+                        primaryTypographyProps={{ fontSize: 14 }}
+                        primary={item}
+                      />
+                    </ListItem>
+                  ))}
                 </List>
 
                 <Typography
@@ -364,21 +325,17 @@ I know how it feels when everything gets blurry and heavy. Self-help books helpe
                   color="textSecondary"
                   sx={{ mt: 3, mb: 1, fontSize: { xs: 14, md: 15 } }}
                 >
-                  This Is Not
+                  {content.quiz.notTitle}
                 </Typography>
                 <List dense>
-                  <ListItem>
-                    <ListItemText
-                      primaryTypographyProps={{ fontSize: 14 }}
-                      primary="No email funnels and no generic answers."
-                    />
-                  </ListItem>
-                  <ListItem>
-                    <ListItemText
-                      primaryTypographyProps={{ fontSize: 14 }}
-                      primary="Your results stay anonymous and are never saved."
-                    />
-                  </ListItem>
+                  {content.quiz.notItems.map((item) => (
+                    <ListItem key={item}>
+                      <ListItemText
+                        primaryTypographyProps={{ fontSize: 14 }}
+                        primary={item}
+                      />
+                    </ListItem>
+                  ))}
                 </List>
               </Box>
             </Grid>
@@ -417,7 +374,7 @@ I know how it feels when everything gets blurry and heavy. Self-help books helpe
                 "&:hover": { backgroundColor: "rgba(255, 7, 58, 1)" },
               }}
             >
-              Take the Ex Quiz
+              {content.quiz.cta}
             </Button>
           </Box>
         </Container>
@@ -435,7 +392,7 @@ I know how it feels when everything gets blurry and heavy. Self-help books helpe
               textAlign: "left",
             }}
           >
-            Your Healing, Inside an App
+            {content.app.title}
           </Typography>
 
           <Typography
@@ -447,9 +404,7 @@ I know how it feels when everything gets blurry and heavy. Self-help books helpe
               textAlign: "left",
             }}
           >
-            Because so much of our life happens online, your healing should too. I built an app where you can track your
-            progress, practice handling uncomfortable moments, and stay connected to the little things that make you
-            feel like you again.
+            {content.app.description}
           </Typography>
 
           {/* screenshot carousel */}
@@ -463,7 +418,7 @@ I know how it feels when everything gets blurry and heavy. Self-help books helpe
                 textAlign: "left",
               }}
             >
-              A Glimpse Inside the App
+              {content.app.previewTitle}
             </Typography>
 
             <Box
@@ -476,14 +431,7 @@ I know how it feels when everything gets blurry and heavy. Self-help books helpe
               }}
             >
               {screenshots.map((src, index) => {
-                const altText =
-                  index === 0
-                    ? "Inner Compass dashboard preview"
-                    : index === 1
-                    ? "Track progress inside the Inner Compass app"
-                    : index === 2
-                    ? "Emergency support feature in the app"
-                    : "Emotional practice scenario in the Inner Compass app";
+                const altText = content.app.previewAlts[index] ?? `${content.app.screenshotAltPrefix} ${index + 1}`;
 
                 return (
                   <Box
@@ -500,7 +448,7 @@ I know how it feels when everything gets blurry and heavy. Self-help books helpe
                       cursor: "pointer",
                     }}
                     role="button"
-                    aria-label={`Open screenshot ${index + 1}`}
+                    aria-label={`${content.app.openScreenshotLabel} ${index + 1}`}
                     onClick={() => handleOpen(index)}
                   >
                     <IconButton
@@ -548,7 +496,7 @@ I know how it feels when everything gets blurry and heavy. Self-help books helpe
                   "&:hover": { backgroundColor: "rgba(255, 7, 58, 1)" },
                 }}
               >
-                Try the App
+                {content.app.cta}
               </Button>
             </Box>
 
@@ -604,7 +552,7 @@ I know how it feels when everything gets blurry and heavy. Self-help books helpe
                 <Box
                   component="img"
                   src={screenshots[selectedIndex]}
-                  alt={`App screenshot ${selectedIndex + 1}`}
+                  alt={`${content.app.screenshotAltPrefix} ${selectedIndex + 1}`}
                   sx={{ maxHeight: "90vh", maxWidth: "90vw", borderRadius: 2 }}
                 />
 
@@ -652,7 +600,7 @@ I know how it feels when everything gets blurry and heavy. Self-help books helpe
                     mb: 1,
                   }}
                 >
-                  Ready to stop doing this alone?
+                  {content.finalCta.title}
                 </Typography>
 
                 <Typography
@@ -664,8 +612,7 @@ I know how it feels when everything gets blurry and heavy. Self-help books helpe
                     fontSize: { xs: "1rem", sm: "1.05rem" },
                   }}
                 >
-                  General advice won&apos;t patch the scars on your soul. In a 1:1 session, we make sense of what
-                  you&apos;re going through and decide together what actually makes sense for you.
+                  {content.finalCta.description}
                 </Typography>
 
                 <Typography
@@ -678,8 +625,7 @@ I know how it feels when everything gets blurry and heavy. Self-help books helpe
                   }}
                 >
                   <i>
-                    If it turns out this isn&apos;t the right step for you, I&apos;ll tell you honestly — and you&apos;re
-                    free to walk away. No pressure, just clarity.
+                    {content.finalCta.note}
                   </i>
                 </Typography>
 
@@ -698,7 +644,7 @@ I know how it feels when everything gets blurry and heavy. Self-help books helpe
                     "&:hover": { backgroundColor: "rgba(255, 7, 58, 1)" },
                   }}
                 >
-                  Book My Session
+                  {content.finalCta.button}
                 </Button>
               </Box>
             </Grid>
