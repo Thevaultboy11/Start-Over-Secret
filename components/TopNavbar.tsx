@@ -16,7 +16,7 @@ import {
   Menu,
   MenuItem,
 } from "@mui/material";
-import MedicalServicesIcon from '@mui/icons-material/MedicalServices';
+import ExploreIcon from '@mui/icons-material/Explore';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 import TelegramIcon from '@mui/icons-material/Telegram';
@@ -77,7 +77,7 @@ export default function TopNav() {
   // ★ TRANSLATED NAV ITEMS
   const drawerLinks = [
     { label: t("topNav.links.home"), path: '/' },
-    { label: t("topNav.links.breakupAidKit"), external: false, path: '/breakup-aid-kit' },
+    { label: t("topNav.links.bookingCall"), external: false, path: '/booking-call' },
     { label: t("topNav.links.getBackWithEx"), path: '/get-back-with-ex' },
     { label: t("topNav.links.contactUs"), path: '/contact-us' },
   ];
@@ -113,7 +113,7 @@ export default function TopNav() {
               "&:hover .logo-text": { color: "#FF073A" },
             }}
           >
-            <MedicalServicesIcon sx={{ mr: 1, color: "white", fontSize: 28 }} />
+            <ExploreIcon sx={{ mr: 1, color: "white", fontSize: 28 }} />
             <Typography
               className="logo-text"
               sx={{
@@ -289,7 +289,7 @@ export default function TopNav() {
         >
           <TelegramIcon />
           <Typography
-            onClick={() => router.push('/breakup-aid-kit')}
+            onClick={() => router.push('/booking-call')}
             sx={{ cursor: 'pointer', fontWeight: 'bold', textDecoration: 'underline' }}
           >
             {t("topNav.banner.message")}
