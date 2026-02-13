@@ -145,7 +145,6 @@ const Login: React.FC = () => {
           >
             <Link href="/signup" passHref>
               <Typography
-                component="a"
                 fontSize={14}
                 fontWeight="bold"
                 mt={1}
@@ -158,7 +157,6 @@ const Login: React.FC = () => {
 
             <Link href="/forgot-password" passHref>
               <Typography
-                component="a"
                 fontSize={14}
                 fontWeight="bold"
                 mt={1}

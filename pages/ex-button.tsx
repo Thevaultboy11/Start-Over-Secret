@@ -7,17 +7,19 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Typography, useTheme, useMediaQuery } from '@mui/material';
 import { motion } from 'framer-motion';
 import { exMessagesEN, exMessagesBS } from "../data/exButtonMessage";
+import { exButtonContentBS, exButtonContentEN } from '@/data/exButtonContent';
+import { appPageLabelsBS, appPageLabelsEN } from '@/data/appPageLabels';
 import { LanguageContext } from "@/context/LanguageContext";
-import { useTranslate } from "../hooks/useTranslate"; // ★ ADDED
 
 function ExButton() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const theme = useTheme();
-  const t = useTranslate(); // ★ ADDED
 
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { language } = useContext(LanguageContext);
+  const content = language === 'bs' ? exButtonContentBS : exButtonContentEN;
+  const page = language === 'bs' ? appPageLabelsBS.exButton : appPageLabelsEN.exButton;
 
   // Messages depending on language
   const messages = language === "bs" ? exMessagesBS : exMessagesEN;
@@ -34,7 +36,7 @@ function ExButton() {
     setCurrentIndex((prev) => (prev + 1) % shuffledMessages.length);
   };
 
-  if (loading) return <div>{t("common.loading")}</div>;
+  if (loading) return <div>{language === 'bs' ? 'Učitavanje...' : 'Loading...'}</div>;
 
   if (!user) {
     if (typeof window !== 'undefined') router.push('/login');
@@ -44,9 +46,10 @@ function ExButton() {
   return (
     <>
       <Head>
-        <title>{t("exButtonPage.title")}</title>
+        <title>{page.title}</title>
         <meta name="robots" content="noindex, nofollow" />
-        <link rel="canonical" href="https://breakupaidkit.com/ex-button" />
+        <meta name="description" content={content.canonicalTitle} />
+        <link rel="canonical" href={`https://breakupaidkit.com${content.canonicalPath}`} />
       </Head>
 
       {/* HEADER */}
@@ -56,7 +59,7 @@ function ExButton() {
         color="white"
         sx={{ px: 2, pt: 2, pb: 4, textAlign: { xs: 'left', sm: 'center' } }}
       >
-        {t("exButtonPage.header")}
+        {page.header}
       </Typography>
 
       {/* BUTTON */}
@@ -79,7 +82,7 @@ function ExButton() {
         }}
       >
         <Typography fontSize={16} fontWeight="bold" color="rgba(255, 255, 255, 0.9)">
-          {t("exButtonPage.button")}
+          {page.button}
         </Typography>
       </motion.div>
 
