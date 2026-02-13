@@ -31,8 +31,9 @@ import {
   Chip,
 } from '@mui/material';
 import Head from 'next/head';
-import Router, { useRouter } from 'next/router';
+import Link from 'next/link';
 import { questionsBS, questionsEN } from '../data/getBackWithEx';
+import { getBackWithExContentBS, getBackWithExContentEN } from '@/data/getBackWithExContent';
 import { LanguageContext } from '@/context/LanguageContext';
 /* ------------------------------------------------------------------ */
 /*  Chart.js – one‑time global registration                           */
@@ -135,45 +136,75 @@ const factorKeys: Record<Factor, (keyof Responses)[]> = {
   EF: ['q21_lastContact', 'q22_socialOpinion', 'q23_pressure', 'q24_externalTies', 'q25_willingEffort'],
 };
 
-const mapAnswerToPoints = (id: keyof Responses, ans: string | number | undefined): number => {
+const scoreMap: Record<keyof Responses, number[] | null> = {
+  q1_loveEx: [3, 2, 1, 0],
+  q2_missScale: null,
+  q3_thinkFrequency: [0, 1, 2, 3],
+  q4_feelingOnSeeing: [1, 2, 3, 0],
+  q5_datingDifficulty: [0, 1, 2],
+  q6_issuesResolved: [2, 1, 0],
+  q7_ownPart: [2, 1, 0],
+  q8_problemsSolvable: [2, 1, 0],
+  q9_trustEase: [2, 1, 0],
+  q10_abuse: [0, 1, 2],
+  q11_argumentFreq: [3, 2, 1, 0],
+  q12_toxicity: [2, 1, 0],
+  q13_sharedValues: [2, 1, 0],
+  q14_bestVersion: [2, 1, 0],
+  q15_initiator: [2, 1, 0],
+  q16_selfFocus: [2, 1, 0],
+  q17_exGrowth: [2, 1, 0],
+  q18_betterPartner: [2, 1, 0],
+  q19_bothGrown: [2, 1, 0],
+  q20_confidenceNoRepeat: [2, 1, 0],
+  q21_lastContact: [0, 1, 2, 3],
+  q22_socialOpinion: [2, 1, 0],
+  q23_pressure: [2, 1, 0],
+  q24_externalTies: [0, 1, 2],
+  q25_willingEffort: [2, 1, 0],
+};
+
+const getOptionIndex = (
+  questions: Question[],
+  id: keyof Responses,
+  ans: string | number | undefined
+): number => {
+  if (typeof ans !== 'string') return -1;
+  const question = questions.find((q) => q.id === id);
+  if (!question?.options) return -1;
+  return question.options.indexOf(ans);
+};
+
+const mapAnswerToPoints = (questions: Question[], id: keyof Responses, ans: string | number | undefined): number => {
   if (ans === undefined) return 0;
-  switch (id) {
-    case 'q1_loveEx':          return ['No','Unsure','Some','Yes'].indexOf(ans as string);
-    case 'q2_missScale':       return Math.round(((Number(ans) - 1) / 9) * 2);
-    case 'q3_thinkFrequency':  return ['Never','Occasionally','A lot','Constantly'].indexOf(ans as string);
-    case 'q4_feelingOnSeeing': return ['Neutral','Happy','Sad','Angry'].indexOf(ans as string);
-    case 'q5_datingDifficulty':return ['Not difficult','Challenging',"Haven’t tried"].indexOf(ans as string);
-    case 'q6_issuesResolved':
-    case 'q7_ownPart':
-    case 'q8_problemsSolvable':return ['No','Partly','Maybe','Yes'].indexOf(ans as string)%3;
-    case 'q9_trustEase':       return ['Unsure','Tough','Can trust'].indexOf(ans as string);
-    case 'q10_abuse':          return ['No','Isolated incident','Yes'].indexOf(ans as string);
-    case 'q11_argumentFreq':   return ['Constantly','Often','Sometimes','Rarely'].indexOf(ans as string);
-    case 'q12_toxicity':       return ['Yes','Some','No'].indexOf(ans as string);
-    case 'q13_sharedValues':   return ['No','Partly','Yes'].indexOf(ans as string);
-    case 'q14_bestVersion':    return ['No','Neutral','Yes'].indexOf(ans as string);
-    case 'q15_initiator':      return ['My ex','Mutual','I did'].indexOf(ans as string);
-    case 'q16_selfFocus':      return ['No change','Distraction','Self‑growth'].indexOf(ans as string);
-    case 'q17_exGrowth':
-    case 'q18_betterPartner':  return ['No','Maybe','Yes'].indexOf(ans as string);
-    case 'q19_bothGrown':      return ['Not really','Partly','Yes'].indexOf(ans as string);
-    case 'q20_confidenceNoRepeat': return ['No','Not sure','Yes'].indexOf(ans as string);
-    case 'q21_lastContact':    return ['< 1 week','1‑4 wks','1‑3 mths','> 3 mths'].indexOf(ans as string);
-    case 'q22_socialOpinion':  return ['Against','Mixed','Supportive'].indexOf(ans as string);
-    case 'q23_pressure':       return ['Yes','A little','No'].indexOf(ans as string);
-    case 'q24_externalTies':   return ['Yes','Some','No'].indexOf(ans as string);
-    case 'q25_willingEffort':  return ['Unsure','I’ll try','Yes'].indexOf(ans as string);
-    default: return 0;
-  }
+  if (id === 'q2_missScale') return Math.round(((Number(ans) - 1) / 9) * 2);
+
+  const answerIndex = getOptionIndex(questions, id, ans);
+  if (answerIndex < 0) return 0;
+
+  const mapped = scoreMap[id];
+  if (!mapped) return 0;
+  return mapped[answerIndex] ?? 0;
+};
+
+const isAbuseAnswer = (questions: Question[], ans: string | number | undefined): boolean => {
+  return getOptionIndex(questions, 'q10_abuse', ans) === 2;
+};
+
+const mapBarLabels = (
+  bars: GraphData['bars'],
+  labels: typeof getBackWithExContentEN.results.charts.barLabels
+) => {
+  return (Object.keys(bars) as (keyof GraphData['bars'])[]).map((key) => labels[key]);
 };
 
 export default function GetBackWithEx() {
-  const router = useRouter();                    // 👈 replaces useNavigate
   const [stage, setStage] = useState<Stage>('start');
   const [responses, setResponses] = useState<Responses>({});
   const [result, setResult] = useState<ResultPayload | null>(null);
   const { language } = useContext(LanguageContext);
   const questions: Question[] =  language === "bs" ? questionsBS : questionsEN;
+  const content = language === 'bs' ? getBackWithExContentBS : getBackWithExContentEN;
   
   
   /* -------------- handlers -------------- */
@@ -187,12 +218,12 @@ export default function GetBackWithEx() {
     const factorScores: Record<Factor, number> = { ER: 0, TPI: 0, CD: 0, PG: 0, EF: 0 };
     (Object.keys(factorKeys) as Factor[]).forEach((f) => {
       const sum = factorKeys[f].reduce(
-        (a, q) => a + mapAnswerToPoints(q, responses[q]),
+        (a, q) => a + mapAnswerToPoints(questions, q, responses[q]),
         0
       );
       factorScores[f] = Math.round((sum / (5 * 2)) * 100);
     });
-    const abuse = responses.q10_abuse === 'Yes';
+    const abuse = isAbuseAnswer(questions, responses.q10_abuse);
     const reuniteIndex = abuse
       ? 0
       : Math.round(
@@ -216,7 +247,7 @@ export default function GetBackWithEx() {
       responses,
       scores,
       flags: {
-        abuse: responses.q10_abuse === 'Yes',
+        abuse: isAbuseAnswer(questions, responses.q10_abuse),
         autoReject: scores.reuniteIndex === 0,
       },
       graphData: {
@@ -289,12 +320,11 @@ export default function GetBackWithEx() {
                     fontSize: { xs: '2rem', sm: '3rem', md: '3.75rem' },
                   }}
                 >
-                  Should I Go Back With My Ex <br /> Alice Dautovic
+                  {content.start.title}
                 </Typography>
 
                 <Typography variant="h6" color="textSecondary" sx={{ mb: 4 }}>
-                  Not sure if going back is right? This 25-question quiz breaks it down
-                  with emotional charts and healing insight. Fast. Free.
+                  {content.start.subtitle}
                 </Typography>
 
                 <Button
@@ -310,7 +340,7 @@ export default function GetBackWithEx() {
                     '&:hover': { bgcolor: 'rgba(255, 7, 58, 1)' },
                   }}
                 >
-                  Find Your Answer
+                  {content.start.startButton}
                 </Button>
               </Container>
             </Box>
@@ -341,25 +371,25 @@ export default function GetBackWithEx() {
                   {/* Text */}
                   <Box sx={{ flex: 1 }}>
                     <Typography variant="h4" fontWeight="bold" mb={4}>
-                      What You’ll Get <br /> After the Test
+                      {content.afterTest.title}
                     </Typography>
 
                     <Typography variant="h6" fontWeight="bold" color="textSecondary" mb={1}>
-                      🎯 After the Quiz, You’ll Know:
+                      {content.afterTest.afterQuizTitle}
                     </Typography>
                     <List dense>
-                      <ListItem><ListItemText primary="Your current emotional blind spots" /></ListItem>
-                      <ListItem><ListItemText primary="How to avoid the cycle of regret or rebound" /></ListItem>
-                      <ListItem><ListItemText primary="What actions to take based on your score" /></ListItem>
+                      {content.afterTest.afterQuizItems.map((item) => (
+                        <ListItem key={item}><ListItemText primary={item} /></ListItem>
+                      ))}
                     </List>
 
                     <Typography variant="h6" fontWeight="bold" color="textSecondary" mt={3} mb={1}>
-                      📊 Detailed Insights:
+                      {content.afterTest.insightsTitle}
                     </Typography>
                     <List dense>
-                      <ListItem><ListItemText primary="Trust, growth, and compatibility percentages" /></ListItem>
-                      <ListItem><ListItemText primary="4+ interactive graphs built from your answers" /></ListItem>
-                      <ListItem><ListItemText primary="“Last Contact” timeline insight" /></ListItem>
+                      {content.afterTest.insightsItems.map((item) => (
+                        <ListItem key={item}><ListItemText primary={item} /></ListItem>
+                      ))}
                     </List>
                   </Box>
                 </Box>
@@ -380,15 +410,14 @@ export default function GetBackWithEx() {
                   <Grid size={{xs:12}}>
                     <Box textAlign="center">
                       <Typography variant="h5" fontWeight="bold" mb={1}>
-                        Alice Dautovic Ex Quiz
+                        {content.midCta.title}
                       </Typography>
                       <Typography
                         variant="h6"
                         color="text.secondary"
                         sx={{ mb: 3, fontWeight: 400 }}
                       >
-                        Reflect on your past relationship with honesty—get the clarity
-                        you need to either walk away stronger or rebuild with intention.
+                        {content.midCta.body}
                       </Typography>
                       <Button
                         variant="contained"
@@ -403,7 +432,7 @@ export default function GetBackWithEx() {
                           '&:hover': { bgcolor: 'rgba(255, 7, 58, 1)' },
                         }}
                       >
-                        Find Your Answer
+                        {content.midCta.button}
                       </Button>
                     </Box>
                   </Grid>
@@ -433,12 +462,10 @@ export default function GetBackWithEx() {
             {/* Intro */}
             <Box mb={4}>
               <Typography variant="h4" fontWeight="bold" gutterBottom>
-                Step 1 · Answer the 25 questions
+                {content.quiz.stepTitle}
               </Typography>
               <Typography variant="body1" color="text.secondary">
-                Choose the option that fits best. Sliders run from <b>1 = low</b> to{' '}
-                <b>10 = high</b>. Once every question is filled in, the “See Results”
-                button unlocks.
+                {content.quiz.instructions}
               </Typography>
             </Box>
 
@@ -530,7 +557,7 @@ export default function GetBackWithEx() {
                 '&:hover': { bgcolor: 'rgba(255, 7, 58, 1)' },
               }}
             >
-              See Results
+              {content.quiz.submit}
             </Button>
           </Paper>
         )}
@@ -539,16 +566,10 @@ export default function GetBackWithEx() {
         {stage === 'results' && result && (() => {
           /* chart-ready datasets (identical logic) */
           const radarData = {
-            labels: [
-              'Emotional Readiness',
-              'Trust & Past Issues',
-              'Compatibility & Dynamics',
-              'Personal Growth',
-              'External Factors',
-            ],
+            labels: content.results.charts.radarLabels,
             datasets: [
               {
-                label: 'Factor Scores',
+                label: content.results.charts.factorLegendLabel,
                 data: result.graphData.radar,
                 backgroundColor: 'rgba(79,195,247,0.2)',
                 borderColor: '#4FC3F7',
@@ -574,10 +595,10 @@ export default function GetBackWithEx() {
           } as const;
 
           const horizontalBarData = {
-            labels: Object.keys(result.graphData.bars),
+            labels: mapBarLabels(result.graphData.bars, content.results.charts.barLabels),
             datasets: [
               {
-                label: 'Scores',
+                label: content.results.charts.scoreLegendLabel,
                 data: Object.values(result.graphData.bars),
                 backgroundColor: '#FF073A',
               },
@@ -614,7 +635,7 @@ export default function GetBackWithEx() {
           };
 
           const lastContactData = {
-            labels: ['Last Contact'],
+            labels: [content.results.charts.lastContactTitle],
             datasets: [
               {
                 label: result.graphData.lastContactBucket,
@@ -652,50 +673,38 @@ export default function GetBackWithEx() {
               }}
             >
               <Typography variant="h4" fontWeight="bold" gutterBottom>
-                Analysis &amp; What to Look For in the Charts Below
+                {content.results.analysisTitle}
               </Typography>
           
               {result.scores.reuniteIndex < 60 ? (
   <>
+    {content.results.lowScoreParagraphs.map((paragraph) => (
+      <Typography key={paragraph} variant="body1" sx={{ mb: 2, lineHeight: 1.75 }}>
+        {paragraph}
+      </Typography>
+    ))}
     <Typography variant="body1" sx={{ mb: 2, lineHeight: 1.75 }}>
-      Your <strong>Reunite Index</strong> and the factor charts show that there’s still a lot of emotional pain and unmet needs. 
-      Going back now would likely bring more hurt than healing.
-    </Typography>
-    <Typography variant="body1" sx={{ mb: 2, lineHeight: 1.75 }}>
-      The charts clearly show which areas—like trust, boundaries, or emotional safety—need your attention first.
-    </Typography>
-    <Typography variant="body1" sx={{ mb: 2, lineHeight: 1.75 }}>
-      If you're not sure how to work on these, I offer private 1-on-1 coaching on Telegram for free.  
-      You can message me directly and I’ll help you figure out the next steps, just for you.
-    </Typography>
-    <Typography variant="body1" sx={{ mb: 2, lineHeight: 1.75 }}>
-      Here's what you'll get with 1-on-1 support:
+      {content.results.lowScoreListTitle}
       <ul style={{ marginTop: '0.5rem', paddingLeft: '1rem' }}>
-        <li>Daily custom advice for your healing journey</li>
-        <li>Simple exercises that help you move forward</li>
-        <li>Private chat with a licensed psychologist</li>
-        <li>Support that’s personal, safe, and confidential</li>
+        {content.results.lowScoreList.map((item) => (
+          <li key={item}>{item}</li>
+        ))}
       </ul>
     </Typography>
   </>
 ) : (
   <>
+    {content.results.highScoreParagraphs.map((paragraph) => (
+      <Typography key={paragraph} variant="body1" sx={{ mb: 2, lineHeight: 1.75 }}>
+        {paragraph}
+      </Typography>
+    ))}
     <Typography variant="body1" sx={{ mb: 2, lineHeight: 1.75 }}>
-      Your score shows real potential for getting back together, but the charts reveal specific issues—like communication or emotional safety—that still need work.
-    </Typography>
-    <Typography variant="body1" sx={{ mb: 2, lineHeight: 1.75 }}>
-      If you want help understanding these areas and how to improve them before reconnecting, I offer 1-on-1 coaching directly on Telegram for free.
-    </Typography>
-    <Typography variant="body1" sx={{ mb: 2, lineHeight: 1.75 }}>
-      You’ll get personal support, clear advice, and step-by-step help to give your relationship the best possible chance.
-    </Typography>
-    <Typography variant="body1" sx={{ mb: 2, lineHeight: 1.75 }}>
-      Here's what you'll receive with 1-on-1 coaching:
+      {content.results.highScoreListTitle}
       <ul style={{ marginTop: '0.5rem', paddingLeft: '1rem' }}>
-        <li>Direct Telegram support tailored to your story</li>
-        <li>Exercises to rebuild trust, clarity, and communication</li>
-        <li>Access to a licensed psychologist in a private setting</li>
-        <li>Support that’s practical, personal, and non-judgmental</li>
+        {content.results.highScoreList.map((item) => (
+          <li key={item}>{item}</li>
+        ))}
       </ul>
     </Typography>
   </>
@@ -704,30 +713,27 @@ export default function GetBackWithEx() {
           
               {/* -----------  BABY‑BLUE CTA (whole box clickable) ----------- */}
               <Box
-                component="a"
-                href="https://t.me/breakupaid_elma"
-                target="_blank"
-                rel="noopener"
+                component={Link}
+                href="/booking-call"
                 sx={{
                   mt: 4,
                   p: { xs: 3, sm: 4 },
-                  bgcolor: '#4FC3F7',
+                  bgcolor: '#ff4fa0',
                   borderRadius: 2,
                   textAlign: 'center',
                   textDecoration: 'none',
                   display: 'block',
                   transition: 'background 0.2s',
-                  '&:hover': { bgcolor: '#35b7ee' },
+                  '&:hover': { bgcolor: '#ff2e8b' },
                 }}
               >
          <Typography variant="h5" fontWeight="bold" sx={{ color: '#fff', mb: 1 }}>
-                  Ready for daily personal support?
+                  {content.results.consultationBoxTitle}
                 </Typography>
                 <Typography variant="body1" sx={{ color: '#fff', mb: 2, lineHeight: 1.6 }}>
-  • Personal voice notes and advice sent daily Q&amp;A<br/>
-  • Tailored “homework” to help you move forward faster<br/>
-  • 1-on-1 access to a licensed psychologist<br/>
-  • Clear, actionable steps based on your unique situation
+                  {content.results.consultationBoxItems.map((item) => (
+                    <React.Fragment key={item}>• {item}<br/></React.Fragment>
+                  ))}
 </Typography>
                 <Button
                   variant="contained"
@@ -738,18 +744,18 @@ export default function GetBackWithEx() {
                     textTransform: 'none',
                     borderRadius: '999px',
                     bgcolor: '#fff',
-                    color: '#4FC3F7',
+                    color: '#ff2e8b',
                     '&:hover': { bgcolor: '#e0f7ff' },
                   }}
                 >
-                  Send Hello!
+                  {content.results.consultationButton}
                 </Button>
               </Box>
             </Paper>
 
 
               <Typography variant="h5" fontWeight="bold" textAlign="center" mb={4}>
-                Your Reunite Index: {result.scores.reuniteIndex}
+                {content.results.reuniteIndexLabel}: {result.scores.reuniteIndex}
               </Typography>
 
               {/* charts grid */}
@@ -765,10 +771,10 @@ export default function GetBackWithEx() {
                     }}
                   >
                     <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-                      Factor Breakdown
+                      {content.results.charts.factorBreakdownTitle}
                     </Typography>
                     <Typography variant="body2" color="gray" gutterBottom>
-                      Balance of Readiness, Trust, Compatibility, Growth &amp; Factors.
+                      {content.results.charts.factorBreakdownSubtitle}
                     </Typography>
                     <Box sx={{ position: 'relative', height: 300 }}>
                       <Radar data={radarData} options={radarOptions} />
@@ -787,10 +793,10 @@ export default function GetBackWithEx() {
                     }}
                   >
                     <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-                      Detailed Scores
+                      {content.results.charts.detailedScoresTitle}
                     </Typography>
                     <Typography variant="body2" color="gray" gutterBottom>
-                      See which factors fall below the healthy 70 + zone.
+                      {content.results.charts.detailedScoresSubtitle}
                     </Typography>
                     <Box sx={{ position: 'relative', height: 300 }}>
                       <Bar data={horizontalBarData} options={horizontalBarOptions} />
@@ -809,10 +815,10 @@ export default function GetBackWithEx() {
                     }}
                   >
                     <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-                      Overall Gauge
+                      {content.results.charts.overallGaugeTitle}
                     </Typography>
                     <Typography variant="body2" color="gray" gutterBottom>
-                      Quick glance at your readiness score.
+                      {content.results.charts.overallGaugeSubtitle}
                     </Typography>
                     <Box sx={{ position: 'relative', height: 250 }}>
                       <Doughnut data={gaugeData} options={gaugeOptions} />
@@ -847,10 +853,10 @@ export default function GetBackWithEx() {
                     }}
                   >
                     <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-                      Last Contact
+                      {content.results.charts.lastContactTitle}
                     </Typography>
                     <Typography variant="body2" color="gray" gutterBottom>
-                      How recent interaction affects emotional readiness.
+                      {content.results.charts.lastContactSubtitle}
                     </Typography>
                     <Box sx={{ position: 'relative', height: 250 }}>
                       <Bar data={lastContactData} options={lastContactOptions} />
@@ -878,7 +884,7 @@ export default function GetBackWithEx() {
                   '&:hover': { bgcolor: '#c40024' },
                 }}
               >
-                Retake Quiz
+                {content.results.charts.retakeQuiz}
               </Button>
             </Box>
           );
