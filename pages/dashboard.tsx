@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   Box, Typography, Paper, Grid, Tooltip, Chip, useMediaQuery, useTheme, List, ListItem, ListItemText, CircularProgress,
 } from '@mui/material';
@@ -7,11 +7,14 @@ import { getDatabase, ref, onValue } from 'firebase/database';
 import withAuth from '../components/withAuth';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { useTranslate } from '../hooks/useTranslate';  // ★ ADDED
+import { LanguageContext } from '@/context/LanguageContext';
+import { dashboardActivityLabelsBS, dashboardActivityLabelsEN } from '@/data/dashboardContent';
+import { appPageLabelsBS, appPageLabelsEN } from '@/data/appPageLabels';
 
 function Dashboard() {
   const { user, loading } = useAuth();
-  const t = useTranslate(); // ★ ADDED
+  const { language } = useContext(LanguageContext);
+  const page = language === 'bs' ? appPageLabelsBS.dashboard : appPageLabelsEN.dashboard;
   const router = useRouter();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -29,12 +32,12 @@ function Dashboard() {
     const db = getDatabase();
     const userRef = ref(db, 'users/' + user.uid);
 
-    onValue(
+    const unsubscribe = onValue(
       userRef,
       (snapshot) => {
         const data = snapshot.val();
         if (!data) {
-          setError(t("dashboardPage.noUserData"));
+          setError(page.noUserData);
           setFireBaseloading(false);
           return;
         }
@@ -79,7 +82,11 @@ function Dashboard() {
         setFireBaseloading(false);
       }
     );
-  }, [user, t]);
+
+    return () => unsubscribe();
+  }, [user, language]);
+
+  const activityLabels = language === 'bs' ? dashboardActivityLabelsBS : dashboardActivityLabelsEN;
 
   const getEmoji = (score: number) => {
     const moodMap: { [key: number]: string } = {
@@ -89,7 +96,7 @@ function Dashboard() {
     return moodMap[score] || '🙂';
   };
 
-  if (loading) return <div>{t("dashboardPage.loadingAuth")}</div>;
+  if (loading) return <div>{page.loadingAuth}</div>;
 
   if (!user) {
     if (typeof window !== 'undefined') router.push('/login');
@@ -99,14 +106,14 @@ function Dashboard() {
   return (
     <>
       <Head>
-        <title>{t("dashboardPage.title")}</title>
+        <title>{page.title}</title>
         <meta name="robots" content="noindex, nofollow" />
         <link rel="canonical" href="https://breakupaidkit.com/dashboard" />
       </Head>
 
       <Box p={2}>
         <Typography variant="h6" fontWeight="bold" gutterBottom>
-          {t("dashboardPage.title")}
+          {page.title}
         </Typography>
 
         {fireBaseloading ? (
@@ -135,7 +142,7 @@ function Dashboard() {
                 <Grid size={{ xs: 6 }}>
                   <Box textAlign="center">
                     <Typography fontSize={16} fontWeight="bold" gutterBottom>
-                      {t("dashboardPage.healingStreak")}
+                      {page.healingStreak}
                     </Typography>
 
                     <Typography
@@ -160,10 +167,11 @@ function Dashboard() {
                 <Grid size={{ xs: 6 }}>
                   <Box textAlign="center">
                     <Typography fontSize={16} fontWeight="bold" gutterBottom>
-                      {t("dashboardPage.averageMood")}
+                      {page.averageMood}
                     </Typography>
 
                     <Typography
+                      component="div"
                       sx={{ py: 2 }}
                       fontSize={36}
                       fontWeight="bold"
@@ -215,17 +223,18 @@ function Dashboard() {
               }}
             >
               <Typography fontSize={16} fontWeight="bold" gutterBottom>
-                {t("dashboardPage.mostUsedActivities")}
+                {page.mostUsedActivities}
               </Typography>
 
               <List>
                 {topActivities.map(([name, count], index) => (
                   <ListItem key={name} disablePadding>
                     <ListItemText
-                      primary={`${index + 1}. ${name}`}
+                      primary={`${index + 1}. ${activityLabels[name as keyof typeof activityLabels] ?? name}`}
                       primaryTypographyProps={{
                         fontSize: 14,
-                        color: 'white'
+                        color: 'white',
+                        sx: { wordBreak: 'break-word', pr: 2 },
                       }}
                     />
                     <Typography fontSize={14} color="white">
@@ -251,15 +260,15 @@ function Dashboard() {
               }}
             >
               <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
-                {t("dashboardPage.emergencyTitle")}
+                {page.emergencyTitle}
               </Typography>
 
               <Typography fontSize={14} paragraph>
-                {t("dashboardPage.emergencyDescription")}
+                {page.emergencyDescription}
               </Typography>
 
               <Typography fontSize={14} fontWeight="bold">
-                {t("dashboardPage.emergencyButton")}
+                {page.emergencyButton}
               </Typography>
             </Box>
           </>

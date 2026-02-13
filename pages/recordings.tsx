@@ -1,5 +1,5 @@
 // pages/recordings.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import withAuth from '../components/withAuth';
 import Head from 'next/head';
 import { useAuth } from '../context/AuthContext';
@@ -32,12 +32,16 @@ import {
   Legend,
 } from 'chart.js';
 import { getDatabase, ref, onValue } from 'firebase/database';
-import { useTranslate } from '../hooks/useTranslate'; // ★ ADDED
+import { LanguageContext } from '@/context/LanguageContext';
+import { appPageLabelsBS, appPageLabelsEN } from '@/data/appPageLabels';
+import { dashboardActivityLabelsBS, dashboardActivityLabelsEN } from '@/data/dashboardContent';
 ChartJS.register(LineElement, PointElement, CategoryScale, LinearScale, Tooltip, Legend);
 
 function Recordings() {
   const { user, loading } = useAuth();
-  const t = useTranslate(); // ★ ADDED
+  const { language } = useContext(LanguageContext);
+  const page = language === 'bs' ? appPageLabelsBS.recordings : appPageLabelsEN.recordings;
+  const activityLabels = language === 'bs' ? dashboardActivityLabelsBS : dashboardActivityLabelsEN;
   const [selectedDay, setSelectedDay] = useState<any>(null);
   const [reflections, setReflections] = useState<any[]>([]);
   const [fireBaseloading, setFireBaseloading] = useState(true);
@@ -50,7 +54,7 @@ function Recordings() {
     const db = getDatabase();
     const userRef = ref(db, 'users/' + user.uid);
 
-    onValue(
+    const unsubscribe = onValue(
       userRef,
       (snapshot) => {
         const data = snapshot.val();
@@ -70,6 +74,8 @@ function Recordings() {
         setFireBaseloading(false);
       }
     );
+
+    return () => unsubscribe();
   }, [user]);
 
   const moodEmoji = (mood: number): string => {
@@ -94,14 +100,14 @@ function Recordings() {
     labels: latestReflections.map((e) => e.date),
     datasets: [
       {
-        label: "Mood", // ★ NEW TRANSLATIONS
+        label: page.chartMoodLabel,
         data: latestReflections.map((e) => e.mood),
         borderColor: '#FF073A',
         backgroundColor: 'rgba(255,7,58,0.2)',
         tension: 0.4,
       },
       {
-        label: "Return Likelihood",
+        label: page.chartReturnLabel,
         data: latestReflections.map((e) => e.returnLikelihood),
         borderColor: '#4FC3F7',
         backgroundColor: 'rgba(79,195,247,0.2)',
@@ -116,7 +122,7 @@ function Recordings() {
     scales: { y: { min: 1, max: 10, ticks: { stepSize: 1 } } }
   };
 
-  if (loading) return <div>{t("recordingsPage.loadingAuth")}</div>; // ★ UPDATED
+  if (loading) return <div>{page.loadingAuth}</div>;
 
   if (!user) {
     if (typeof window !== 'undefined') router.push('/login');
@@ -126,7 +132,7 @@ function Recordings() {
   return (
     <>
       <Head>
-        <title>{t("recordingsPage.title")}</title>
+        <title>{page.title}</title>
         <meta name="robots" content="noindex, nofollow" />
         <link rel="canonical" href="https://breakupaidkit.com/recordings" />
       </Head>
@@ -135,7 +141,7 @@ function Recordings() {
         {/* Header */}
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
           <Typography variant="h6" fontWeight="bold">
-            {t("recordingsPage.latestReflections")}
+            {page.latestReflections}
           </Typography>
 
           <IconButton
@@ -153,7 +159,7 @@ function Recordings() {
           <Typography color="error" fontSize={14} textAlign="center">{error}</Typography>
         ) : reflections.length === 0 ? (
           <Typography color="white" fontSize={14} textAlign="center">
-            {t("recordingsPage.noReflections")}
+            {page.noReflections}
           </Typography>
         ) : (
           <>
@@ -168,11 +174,11 @@ function Recordings() {
               }}
             >
               <Typography fontSize={16} fontWeight="bold" gutterBottom>
-                {t("recordingsPage.chartTitle")}
+                {page.chartTitle}
               </Typography>
 
               <Typography fontSize={13} color="gray" gutterBottom>
-                {t("recordingsPage.chartDescription")}
+                {page.chartDescription}
               </Typography>
 
               <Box sx={{ width: '100%', overflowX: 'auto', minHeight: 250 }}>
@@ -192,11 +198,11 @@ function Recordings() {
               }}
             >
               <Typography fontSize={16} fontWeight="bold" gutterBottom>
-                {t("recordingsPage.recentLogTitle")}
+                {page.recentLogTitle}
               </Typography>
 
               <Typography fontSize={13} color="gray" gutterBottom>
-                {t("recordingsPage.recentLogDescription")}
+                {page.recentLogDescription}
               </Typography>
 
               <TableContainer>
@@ -227,7 +233,7 @@ function Recordings() {
                             sx={{ fontSize: 14, fontWeight: 'bold', textTransform: 'none' }}
                             onClick={() => setSelectedDay(entry)}
                           >
-                            {t("recordingsPage.viewAllInfo")}
+                            {page.viewAllInfo}
                           </Button>
                         </TableCell>
                       </TableRow>
@@ -248,24 +254,24 @@ function Recordings() {
                 }}
               >
                 <DialogTitle sx={{ color: 'white' }}>
-                  {t("recordingsPage.dialog.reflection")} {selectedDay?.date}
+                  {page.dialogReflection} {selectedDay?.date}
                 </DialogTitle>
 
                 <DialogContent>
                   <Typography fontSize={14} mb={1} color="white">
-                    <strong>{t("recordingsPage.dialog.mood")}</strong> {selectedDay?.mood}
+                    <strong>{page.dialogMood}</strong> {selectedDay?.mood}
                   </Typography>
 
                   <Typography fontSize={14} mb={1} color="white">
-                    <strong>{t("recordingsPage.dialog.returnLikelihood")}</strong> {selectedDay?.returnLikelihood}
+                    <strong>{page.dialogReturnLikelihood}</strong> {selectedDay?.returnLikelihood}
                   </Typography>
 
                   <Typography fontSize={14} mb={1} color="white">
-                    <strong>{t("recordingsPage.dialog.reflectionText")}</strong> {selectedDay?.reflectionText}
+                    <strong>{page.dialogReflectionText}</strong> {selectedDay?.reflectionText}
                   </Typography>
 
                   <Typography fontSize={14} color="white">
-                    <strong>{t("recordingsPage.dialog.activities")}</strong> {selectedDay?.activities?.join(', ')}
+                    <strong>{page.dialogActivities}</strong> {selectedDay?.activities?.map((activityKey: string) => activityLabels[activityKey as keyof typeof activityLabels] ?? activityKey).join(', ')}
                   </Typography>
                 </DialogContent>
               </Paper>
