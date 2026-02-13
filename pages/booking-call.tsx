@@ -112,10 +112,7 @@ export default function BookingCallPage() {
                     borderRadius: 2,
                   }}
                 >
-                  <Typography variant="h4" sx={{ fontWeight: "bold", mb: 2, fontSize: { xs: "1.7rem", md: "2rem" } }}>
-                    {content.trust.title}
-                  </Typography>
-
+               
                   <Typography variant="h6" sx={{ fontWeight: "bold", mb: 2 }}>
                     {content.trust.name}
                   </Typography>
@@ -136,7 +133,7 @@ export default function BookingCallPage() {
               <Grid size={{ xs: 12, md: 6 }}>
                 <Box
                   component="img"
-                  src="/cta2_image.png"
+                  src="/authority.png"
                   alt="Elma Dzananovic"
                   sx={{
                     width: "100%",
