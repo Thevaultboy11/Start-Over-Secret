@@ -37,7 +37,7 @@ function Dashboard() {
       (snapshot) => {
         const data = snapshot.val();
         if (!data) {
-          setError(t("dashboardPage.noUserData"));
+          setError(page.noUserData);
           setFireBaseloading(false);
           return;
         }
@@ -96,7 +96,7 @@ function Dashboard() {
     return moodMap[score] || '🙂';
   };
 
-  if (loading) return <div>{t("dashboardPage.loadingAuth")}</div>;
+  if (loading) return <div>{page.loadingAuth}</div>;
 
   if (!user) {
     if (typeof window !== 'undefined') router.push('/login');
@@ -106,14 +106,14 @@ function Dashboard() {
   return (
     <>
       <Head>
-        <title>{t("dashboardPage.title")}</title>
+        <title>{page.title}</title>
         <meta name="robots" content="noindex, nofollow" />
         <link rel="canonical" href="https://breakupaidkit.com/dashboard" />
       </Head>
 
       <Box p={2}>
         <Typography variant="h6" fontWeight="bold" gutterBottom>
-          {t("dashboardPage.title")}
+          {page.title}
         </Typography>
 
         {fireBaseloading ? (
@@ -142,7 +142,7 @@ function Dashboard() {
                 <Grid size={{ xs: 6 }}>
                   <Box textAlign="center">
                     <Typography fontSize={16} fontWeight="bold" gutterBottom>
-                      {t("dashboardPage.healingStreak")}
+                      {page.healingStreak}
                     </Typography>
 
                     <Typography
@@ -167,7 +167,7 @@ function Dashboard() {
                 <Grid size={{ xs: 6 }}>
                   <Box textAlign="center">
                     <Typography fontSize={16} fontWeight="bold" gutterBottom>
-                      {t("dashboardPage.averageMood")}
+                      {page.averageMood}
                     </Typography>
 
                     <Typography
@@ -223,7 +223,7 @@ function Dashboard() {
               }}
             >
               <Typography fontSize={16} fontWeight="bold" gutterBottom>
-                {t("dashboardPage.mostUsedActivities")}
+                {page.mostUsedActivities}
               </Typography>
 
               <List>
@@ -260,15 +260,15 @@ function Dashboard() {
               }}
             >
               <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
-                {t("dashboardPage.emergencyTitle")}
+                {page.emergencyTitle}
               </Typography>
 
               <Typography fontSize={14} paragraph>
-                {t("dashboardPage.emergencyDescription")}
+                {page.emergencyDescription}
               </Typography>
 
               <Typography fontSize={14} fontWeight="bold">
-                {t("dashboardPage.emergencyButton")}
+                {page.emergencyButton}
               </Typography>
             </Box>
           </>
